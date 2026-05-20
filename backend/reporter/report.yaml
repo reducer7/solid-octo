@@ -1,0 +1,5 @@
+report:
+  include_novel_flag: true
+  include_reuse_flag: true
+  fuzz_scores: true
+  hide_marker_details: true

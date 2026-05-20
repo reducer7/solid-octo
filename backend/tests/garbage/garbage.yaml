@@ -1,0 +1,30 @@
+garbage:
+  entropy:
+    terminal_gt: 5.0
+    low_lt: 3.0
+    low_add_human: 10
+    mid_add_human: 1
+    mid_add_ai: 1
+  repeated_char_density:
+    warning_gt: 0.15
+    warning_add_garbage: 20
+    terminal_gt: 0.25
+    terminal_score: 999
+  non_printable_density:
+    warning_gt: 0.02
+    warning_add_garbage: 20
+    terminal_gt: 0.05
+    terminal_score: 999
+  unicode_outliers:
+    other_gt: 0.20
+    punct_gt: 0.20
+    symbol_gt: 0.20
+    number_gt: 0.50
+    terminal_score: 999
+  word_salad:
+    dictionary_path: backend/tests/garbage/common_words_5k.txt
+    uncommon_warning_gt: 0.30
+    warning_add_garbage: 100
+    uncommon_terminal_gt: 0.85
+    terminal_score: 999
+    token_pattern: "[A-Za-z']+"

@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solidocto - Test Frontend</title>
+  <style>
+    :root {
+      --bg-1: #f3f7ff;
+      --bg-2: #fdf8ef;
+      --ink: #1b1a24;
+      --muted: #5a5f73;
+      --panel: rgba(255, 255, 255, 0.72);
+      --line: rgba(41, 48, 84, 0.16);
+      --accent: #1358d8;
+      --accent-2: #f06b24;
+      --good: #1f8f57;
+      --bad: #b3261e;
+      --radius: 16px;
+      --shadow: 0 20px 50px rgba(0, 25, 70, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+      background:
+        radial-gradient(circle at 12% 5%, rgba(19, 88, 216, 0.13) 0%, rgba(19, 88, 216, 0) 38%),
+        radial-gradient(circle at 95% 12%, rgba(240, 107, 36, 0.16) 0%, rgba(240, 107, 36, 0) 32%),
+        linear-gradient(145deg, var(--bg-1), var(--bg-2));
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .shell {
+      width: min(980px, 100%);
+      background: var(--panel);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 22px 26px 14px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.35));
+    }
+
+    .brand {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+
+    .tag {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 3px;
+    }
+
+    .content {
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 0.86rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    input[type="text"],
+    textarea {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--ink);
+      font: inherit;
+      transition: border-color 150ms ease;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 170px;
+      max-height: 360px;
+      line-height: 1.45;
+    }
+
+    .counter {
+      font-size: 0.83rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .captcha-wrap {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .captcha-question {
+      font-weight: 700;
+      color: var(--ink);
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(19, 88, 216, 0.09);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), #0b72ff);
+      box-shadow: 0 10px 25px rgba(20, 90, 210, 0.25);
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .score-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      min-height: 98px;
+    }
+
+    .score-title {
+      font-size: 0.83rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .score-value {
+      margin-top: 10px;
+      font-size: 2.05rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-ai .score-value {
+      color: #0f5ec4;
+    }
+
+    .score-human .score-value {
+      color: var(--good);
+    }
+
+    .score-garbage .score-value {
+      color: var(--bad);
+    }
+
+    .meta {
+      margin-top: 12px;
+      display: grid;
+      gap: 6px;
+      font-size: 0.92rem;
+    }
+
+    .status {
+      padding: 9px 10px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .status-ok {
+      background: rgba(31, 143, 87, 0.14);
+      color: #155838;
+    }
+
+    .status-warn {
+      background: rgba(240, 107, 36, 0.17);
+      color: #7a421f;
+    }
+
+    .status-error {
+      background: rgba(179, 38, 30, 0.13);
+      color: #7a1c17;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px;
+      max-height: 190px;
+      overflow: auto;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 840px) {
+      .results {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <div class="brand">Solidocto</div>
+        <div class="tag">Know your text. Test harness UI for pass 1 and pass 2.</div>
+      </div>
+      <div id="connectionBadge" class="status status-warn">Socket not connected</div>
+    </header>
+
+    <section class="content">
+      <div class="panel">
+        <div class="row">
+          <div class="field" style="grid-column: span 8;">
+            <label for="wsUrl">WebSocket URL</label>
+            <input id="wsUrl" type="text" value="ws://127.0.0.1:8765" spellcheck="false">
+          </div>
+          <div class="field" style="grid-column: span 4;">
+            <label>&nbsp;</label>
+            <button id="connectBtn" class="btn-secondary" type="button">Connect Socket</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="field">
+          <label for="textInput">Input Text</label>
+          <textarea id="textInput" maxlength="1023" placeholder="Paste up to 1023 characters... Unicode is accepted."></textarea>
+          <div id="charCounter" class="counter">0 / 1023</div>
+        </div>
+
+        <div class="captcha-wrap">
+          <span class="captcha-question" id="captchaQuestion">Solve: 0 + 0 = ?</span>
+          <input id="captchaInput" type="text" inputmode="numeric" placeholder="Answer" style="width: 120px;">
+          <button id="newCaptchaBtn" class="btn-secondary" type="button">New Challenge</button>
+        </div>
+
+        <div class="actions">
+          <div class="hint">Frontend sends: text, captcha_token, datetimeUTC, simhash.</div>
+          <div style="display:flex; gap:8px;">
+            <button id="analyzeBtn" class="btn-primary" type="button">Analyse Text</button>
+            <button id="clearBtn" class="btn-secondary" type="button">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="results">
+          <article class="score-card score-ai">
+            <div class="score-title">AI Indicators</div>
+            <div id="aiScore" class="score-value">-</div>
+          </article>
+          <article class="score-card score-human">
+            <div class="score-title">Human Indicators</div>
+            <div id="humanScore" class="score-value">-</div>
+          </article>
+          <article class="score-card score-garbage">
+            <div class="score-title">Unidentified Indicators</div>
+            <div id="garbageScore" class="score-value">-</div>
+          </article>
+        </div>
+
+        <div class="meta">
+          <div id="novelty" class="status status-warn">No result yet.</div>
+          <div id="simhashLine" class="hint">Simhash: -</div>
+          <div id="skipLine" class="hint">Skip reason: -</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <label for="rawOutput">Raw Response JSON</label>
+        <pre id="rawOutput">{}</pre>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const MAX_CHARS = 1023;
+
+    const state = {
+      ws: null,
+      captchaAnswer: null
+    };
+
+    const els = {
+      wsUrl: document.getElementById("wsUrl"),
+      connectBtn: document.getElementById("connectBtn"),
+      connectionBadge: document.getElementById("connectionBadge"),
+      textInput: document.getElementById("textInput"),
+      charCounter: document.getElementById("charCounter"),
+      captchaQuestion: document.getElementById("captchaQuestion"),
+      captchaInput: document.getElementById("captchaInput"),
+      newCaptchaBtn: document.getElementById("newCaptchaBtn"),
+      analyzeBtn: document.getElementById("analyzeBtn"),
+      clearBtn: document.getElementById("clearBtn"),
+      aiScore: document.getElementById("aiScore"),
+      humanScore: document.getElementById("humanScore"),
+      garbageScore: document.getElementById("garbageScore"),
+      novelty: document.getElementById("novelty"),
+      simhashLine: document.getElementById("simhashLine"),
+      skipLine: document.getElementById("skipLine"),
+      rawOutput: document.getElementById("rawOutput")
+    };
+
+    function setStatus(message, kind) {
+      els.connectionBadge.textContent = message;
+      els.connectionBadge.className = `status status-${kind}`;
+    }
+
+    function generateCaptcha() {
+      const a = Math.floor(Math.random() * 8) + 1;
+      const b = Math.floor(Math.random() * 8) + 1;
+      state.captchaAnswer = a + b;
+      els.captchaQuestion.textContent = `Solve: ${a} + ${b} = ?`;
+      els.captchaInput.value = "";
+    }
+
+    function updateCounter() {
+      const value = els.textInput.value.slice(0, MAX_CHARS);
+      if (value !== els.textInput.value) {
+        els.textInput.value = value;
+      }
+      els.charCounter.textContent = `${value.length} / ${MAX_CHARS}`;
+    }
+
+    function clampScore(v) {
+      if (typeof v !== "number") {
+        return "-";
+      }
+      return String(Math.max(0, Math.min(999, Math.round(v))));
+    }
+
+    // Deterministic 64-bit SimHash from token hashes using BigInt operations.
+    function computeSimhash64(text) {
+      const tokens = (text.toLowerCase().match(/[\p{L}\p{N}']+/gu) || []);
+      if (tokens.length === 0) {
+        return "0x0000000000000000";
+      }
+
+      const vector = new Array(64).fill(0);
+      for (const token of tokens) {
+        const hash = fnv1a64(token);
+        for (let i = 0n; i < 64n; i++) {
+          const bit = (hash >> i) & 1n;
+          vector[Number(i)] += bit === 1n ? 1 : -1;
+        }
+      }
+
+      let result = 0n;
+      for (let i = 0n; i < 64n; i++) {
+        if (vector[Number(i)] >= 0) {
+          result |= (1n << i);
+        }
+      }
+      return `0x${result.toString(16).padStart(16, "0")}`;
+    }
+
+    // FNV-1a 64-bit hash for per-token hashing in client-side simhash generation.
+    function fnv1a64(input) {
+      let hash = 0xcbf29ce484222325n;
+      const prime = 0x100000001b3n;
+      const encoder = new TextEncoder();
+      const bytes = encoder.encode(input);
+      for (const byte of bytes) {
+        hash ^= BigInt(byte);
+        hash = BigInt.asUintN(64, hash * prime);
+      }
+      return hash;
+    }
+
+    function connectSocket() {
+      const url = els.wsUrl.value.trim();
+      if (!url) {
+        setStatus("Socket URL is required", "error");
+        return;
+      }
+
+      if (state.ws && state.ws.readyState <= 1) {
+        state.ws.close();
+      }
+
+      setStatus("Connecting...", "warn");
+      const ws = new WebSocket(url);
+      state.ws = ws;
+
+      ws.onopen = () => setStatus("Socket connected", "ok");
+      ws.onerror = () => setStatus("Socket error", "error");
+      ws.onclose = () => setStatus("Socket disconnected", "warn");
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          renderResponse(data);
+        } catch (_err) {
+          els.rawOutput.textContent = String(event.data);
+          setStatus("Received non-JSON response", "error");
+        }
+      };
+    }
+
+    function renderResponse(payload) {
+      els.rawOutput.textContent = JSON.stringify(payload, null, 2);
+
+      if (payload.error) {
+        els.aiScore.textContent = "-";
+        els.humanScore.textContent = "-";
+        els.garbageScore.textContent = "-";
+        els.novelty.textContent = `Error: ${payload.error}`;
+        els.novelty.className = "status status-error";
+        return;
+      }
+
+      els.aiScore.textContent = clampScore(payload.ai_count);
+      els.humanScore.textContent = clampScore(payload.human_score);
+      els.garbageScore.textContent = clampScore(payload.garbage_score);
+
+      const novel = payload.novel_text;
+      const reused = payload.reused_result;
+      if (novel === true) {
+        els.novelty.textContent = "Novel text: new analysis run.";
+        els.novelty.className = "status status-ok";
+      } else if (reused === true) {
+        els.novelty.textContent = "Very similar text seen before: reused prior result.";
+        els.novelty.className = "status status-warn";
+      } else {
+        els.novelty.textContent = "Result returned.";
+        els.novelty.className = "status status-warn";
+      }
+
+      els.simhashLine.textContent = `Simhash: ${payload.simhash || "-"}`;
+      els.skipLine.textContent = `Skip reason: ${payload.skip_reason || "-"}`;
+    }
+
+    function analyseText() {
+      if (!state.ws || state.ws.readyState !== WebSocket.OPEN) {
+        setStatus("Connect socket before analysis", "error");
+        return;
+      }
+
+      const text = els.textInput.value.trim();
+      if (!text) {
+        setStatus("Text is required", "error");
+        return;
+      }
+
+      const answer = Number(els.captchaInput.value.trim());
+      if (!Number.isFinite(answer) || answer !== state.captchaAnswer) {
+        setStatus("Captcha answer is incorrect", "error");
+        return;
+      }
+
+      const payload = {
+        text,
+        captcha_token: `math:${Date.now()}`,
+        datetimeUTC: new Date().toISOString(),
+        simhash: computeSimhash64(text)
+      };
+
+      try {
+        state.ws.send(JSON.stringify(payload));
+        setStatus("Request sent", "ok");
+      } catch (_err) {
+        setStatus("Failed to send request", "error");
+      }
+
+      generateCaptcha();
+    }
+
+    function clearForm() {
+      els.textInput.value = "";
+      updateCounter();
+      els.aiScore.textContent = "-";
+      els.humanScore.textContent = "-";
+      els.garbageScore.textContent = "-";
+      els.novelty.textContent = "No result yet.";
+      els.novelty.className = "status status-warn";
+      els.simhashLine.textContent = "Simhash: -";
+      els.skipLine.textContent = "Skip reason: -";
+      els.rawOutput.textContent = "{}";
+      generateCaptcha();
+    }
+
+    els.textInput.addEventListener("input", updateCounter);
+    els.connectBtn.addEventListener("click", connectSocket);
+    els.newCaptchaBtn.addEventListener("click", generateCaptcha);
+    els.analyzeBtn.addEventListener("click", analyseText);
+    els.clearBtn.addEventListener("click", clearForm);
+
+    updateCounter();
+    generateCaptcha();
+  </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+testing:
+  use_in_memory_store: true
+  disable_fuzz_for_tests: true

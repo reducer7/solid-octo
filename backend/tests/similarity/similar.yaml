@@ -1,0 +1,8 @@
+similarity:
+  hamming_max_distance: 5
+  require_exact_hamming_check: true
+  use_redisbloom: true
+  use_fallback_search: true
+  lsh:
+    bands: 8
+    bits: 64
