@@ -27,6 +27,12 @@ def generate_response(
         "human_score": human,
         "garbage_score": garbage,
         "simhash": ctx.computed_simhash_hex,
+        "score_contributions": ctx.score_contributions,
+        "score_totals": {
+            "ai": ctx.score.ai_score,
+            "human": ctx.score.human_score,
+            "garbage": ctx.score.garbage_score,
+        },
     }
 
     if bool(report_cfg["include_novel_flag"]):

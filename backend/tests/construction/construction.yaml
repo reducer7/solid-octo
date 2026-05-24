@@ -1,0 +1,90 @@
+construction:
+  model:
+    embedding_model: all-MiniLM-L6-v2
+    spacy_model: en_core_web_sm
+    min_sentences: 2
+
+  semantic_coherence:
+    low_threshold: 0.2
+    low_ratio: 0.5
+    add_garbage: 10
+
+  topic_persistence:
+    min_sentences: 3
+    cluster_distance_threshold: 0.5
+    high_ratio: 0.75
+    high_add_garbage: 20
+    mid_ratio: 0.50
+    mid_add_garbage: 10
+
+  embedding_variance:
+    very_low_lt: 0.05
+    very_low_add_ai: 10
+    mod_low_lt: 0.1
+    mod_low_add_ai: 5
+    human_lt: 0.25
+    human_add_human: 5
+    mod_high_lt: 0.35
+    mod_high_add_human: 1
+    mod_high_add_garbage: 5
+    very_high_add_garbage: 10
+
+  marker_clause:
+    markers:
+      - because
+      - however
+      - therefore
+      - although
+    add_ai: 5
+    min_clause_words: 3
+
+  semantic_marker:
+    because:
+      low_lt: 0.2
+      low_add_ai: 5
+      low_add_garbage: 10
+      mid_lt: 0.3
+      mid_add_ai: 5
+      mid_add_garbage: 5
+      high_add_human: 5
+      high_add_ai: 5
+    however:
+      very_low_lt: 0.1
+      very_low_add_ai: 1
+      very_low_add_garbage: 10
+      low_lt: 0.2
+      low_add_ai: 1
+      low_add_garbage: 5
+      mid_lt: 0.6
+      mid_add_ai: 2
+      mid_add_human: 3
+      high_gte: 0.8
+      high_add_garbage: 5
+      high_add_ai: 5
+    therefore:
+      high_gt: 0.4
+      high_add_ai: 2
+      high_add_human: 5
+      low_add_garbage: 5
+      low_add_ai: 2
+    although:
+      low_lt: 0.2
+      low_add_ai: 5
+      low_add_garbage: 5
+      mid_lt: 0.6
+      mid_add_human: 5
+      mid_add_ai: 2
+      high_add_garbage: 5
+      high_add_ai: 5
+
+  marker_spiral:
+    markers:
+      - because
+      - however
+      - therefore
+      - although
+    freq_per_sentence_gt: 1
+    freq_add_ai: 2
+    multi_marker_per_sentence_add_ai: 2
+    multi_type_threshold: 3
+    multi_type_add_ai: 4

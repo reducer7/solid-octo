@@ -16,8 +16,8 @@
       --accent-2: #f06b24;
       --good: #1f8f57;
       --bad: #b3261e;
-      --radius: 16px;
-      --shadow: 0 20px 50px rgba(0, 25, 70, 0.13);
+      --radius: 10px;
+      --shadow: 0 8px 20px rgba(0, 25, 70, 0.10);
     }
 
     * {
@@ -30,20 +30,20 @@
       color: var(--ink);
       font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
       background:
-        radial-gradient(circle at 12% 5%, rgba(19, 88, 216, 0.13) 0%, rgba(19, 88, 216, 0) 38%),
-        radial-gradient(circle at 95% 12%, rgba(240, 107, 36, 0.16) 0%, rgba(240, 107, 36, 0) 32%),
+        radial-gradient(circle at 12% 5%, rgba(19, 88, 216, 0.10) 0%, rgba(19, 88, 216, 0) 38%),
+        radial-gradient(circle at 95% 12%, rgba(240, 107, 36, 0.10) 0%, rgba(240, 107, 36, 0) 32%),
         linear-gradient(145deg, var(--bg-1), var(--bg-2));
       display: grid;
       place-items: center;
-      padding: 20px;
+      padding: 6px;
     }
 
     .shell {
-      width: min(980px, 100%);
+      width: min(700px, 100%);
       background: var(--panel);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(6px);
       border: 1px solid var(--line);
-      border-radius: 24px;
+      border-radius: 14px;
       box-shadow: var(--shadow);
       overflow: hidden;
     }
@@ -52,51 +52,51 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      gap: 12px;
-      padding: 22px 26px 14px;
+      gap: 6px;
+      padding: 10px 14px 6px;
       border-bottom: 1px solid var(--line);
       background: linear-gradient(to right, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.35));
     }
 
     .brand {
-      font-size: 1.5rem;
+      font-size: 1.1rem;
       font-weight: 800;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
     }
 
     .tag {
       color: var(--muted);
-      font-size: 0.95rem;
-      margin-top: 3px;
+      font-size: 0.78rem;
+      margin-top: 1px;
     }
 
     .content {
-      padding: 20px;
+      padding: 8px;
       display: grid;
-      gap: 16px;
+      gap: 8px;
     }
 
     .panel {
       background: rgba(255, 255, 255, 0.82);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 16px;
+      padding: 8px 10px;
     }
 
     .row {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
-      gap: 12px;
+      gap: 6px;
       align-items: center;
     }
 
     .field {
       display: grid;
-      gap: 8px;
+      gap: 4px;
     }
 
     label {
-      font-size: 0.86rem;
+      font-size: 0.75rem;
       color: var(--muted);
       font-weight: 700;
       text-transform: uppercase;
@@ -107,8 +107,8 @@
     textarea {
       border: 1px solid var(--line);
       background: rgba(255, 255, 255, 0.95);
-      border-radius: 12px;
-      padding: 10px 12px;
+      border-radius: 8px;
+      padding: 6px 8px;
       color: var(--ink);
       font: inherit;
       transition: border-color 150ms ease;
@@ -122,48 +122,45 @@
 
     textarea {
       resize: vertical;
-      min-height: 170px;
-      max-height: 360px;
-      line-height: 1.45;
+      min-height: 70px;
+      max-height: 160px;
+      line-height: 1.3;
     }
 
     .counter {
-      font-size: 0.83rem;
+      font-size: 0.7rem;
       color: var(--muted);
       text-align: right;
     }
 
-    .captcha-wrap {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 8px;
+    .word-counter {
+      font-size: 0.7rem;
       color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .captcha-question {
-      font-weight: 700;
-      color: var(--ink);
-      padding: 8px 10px;
-      border-radius: 10px;
-      background: rgba(19, 88, 216, 0.09);
+      text-align: right;
+      margin-top: 2px;
     }
 
     .actions {
       display: flex;
-      gap: 10px;
+      gap: 6px;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      margin-top: 12px;
+      margin-top: 4px;
+    }
+
+    .honeypot {
+      position: absolute;
+      left: -10000px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
     }
 
     button {
       border: none;
-      border-radius: 12px;
-      padding: 11px 16px;
+      border-radius: 8px;
+      padding: 7px 12px;
       font: inherit;
       font-weight: 700;
       cursor: pointer;
@@ -183,25 +180,35 @@
 
     .hint {
       color: var(--muted);
-      font-size: 0.88rem;
+      font-size: 0.7rem;
+    }
+
+    .hint-warning {
+      color: #7a421f;
+      background: rgba(240, 107, 36, 0.12);
+      border: 1px solid rgba(240, 107, 36, 0.22);
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-size: 0.7rem;
+      display: none;
     }
 
     .results {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 6px;
     }
 
     .score-card {
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
+      border-radius: 8px;
+      padding: 6px;
       background: #fff;
-      min-height: 98px;
+      min-height: 60px;
     }
 
     .score-title {
-      font-size: 0.83rem;
+      font-size: 0.7rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -209,8 +216,8 @@
     }
 
     .score-value {
-      margin-top: 10px;
-      font-size: 2.05rem;
+      margin-top: 4px;
+      font-size: 1.2rem;
       font-weight: 800;
       line-height: 1;
     }
@@ -228,15 +235,31 @@
     }
 
     .meta {
-      margin-top: 12px;
+      margin-top: 4px;
       display: grid;
-      gap: 6px;
-      font-size: 0.92rem;
+      gap: 3px;
+      font-size: 0.75rem;
+    }
+
+    .breakdown {
+      margin-top: 2px;
+      display: grid;
+      gap: 2px;
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+
+    .breakdown-title {
+      font-weight: 700;
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.68rem;
     }
 
     .status {
-      padding: 9px 10px;
-      border-radius: 10px;
+      padding: 4px 6px;
+      border-radius: 6px;
       font-weight: 600;
     }
 
@@ -260,12 +283,44 @@
       white-space: pre-wrap;
       word-break: break-word;
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: 8px;
       background: #fff;
-      padding: 10px;
-      max-height: 190px;
+      padding: 5px;
+      min-height: 80px;
       overflow: auto;
-      font-size: 0.85rem;
+      font-size: 0.7rem;
+      resize: vertical;
+    }
+
+    .progress-strip {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      background: rgba(19, 88, 216, 0.08);
+      border: 1px solid rgba(19, 88, 216, 0.18);
+      font-size: 0.75rem;
+      color: #0c3a8a;
+      font-weight: 600;
+    }
+
+    .progress-strip.visible {
+      display: flex;
+    }
+
+    .progress-spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(19, 88, 216, 0.25);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     @media (max-width: 840px) {
@@ -297,7 +352,7 @@
             <input id="wsUrl" type="text" value="ws://127.0.0.1:8765" spellcheck="false">
           </div>
           <div class="field" style="grid-column: span 4;">
-            <label>&nbsp;</label>
+            <span class="hint" aria-hidden="true">&nbsp;</span>
             <button id="connectBtn" class="btn-secondary" type="button">Connect Socket</button>
           </div>
         </div>
@@ -308,16 +363,21 @@
           <label for="textInput">Input Text</label>
           <textarea id="textInput" maxlength="1023" placeholder="Paste up to 1023 characters... Unicode is accepted."></textarea>
           <div id="charCounter" class="counter">0 / 1023</div>
+          <div id="wordCounter" class="word-counter">0 words</div>
         </div>
 
-        <div class="captcha-wrap">
-          <span class="captcha-question" id="captchaQuestion">Solve: 0 + 0 = ?</span>
-          <input id="captchaInput" type="text" inputmode="numeric" placeholder="Answer" style="width: 120px;">
-          <button id="newCaptchaBtn" class="btn-secondary" type="button">New Challenge</button>
+        <div class="honeypot" aria-hidden="true">
+          <label for="hpWebsite">Website</label>
+          <input id="hpWebsite" type="text" name="website" autocomplete="off" tabindex="-1">
+          <label for="hpCompany">Company</label>
+          <input id="hpCompany" type="text" name="company" autocomplete="off" tabindex="-1">
         </div>
 
         <div class="actions">
-          <div class="hint">Frontend sends: text, captcha_token, datetimeUTC, simhash.</div>
+          <div>
+            <div class="hint">Frontend sends: text, datetimeUTC, simhash.</div>
+            <div id="shortSampleWarning" class="hint-warning">Short samples may stack 'Other' indicators</div>
+          </div>
           <div style="display:flex; gap:8px;">
             <button id="analyzeBtn" class="btn-primary" type="button">Analyse Text</button>
             <button id="clearBtn" class="btn-secondary" type="button">Clear</button>
@@ -326,25 +386,34 @@
       </div>
 
       <div class="panel">
+        <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px;">Indicators</div>
         <div class="results">
-          <article class="score-card score-ai">
-            <div class="score-title">AI Indicators</div>
+          <article class="score-card score-ai" id="aiCard">
+            <div class="score-title">AI</div>
             <div id="aiScore" class="score-value">-</div>
           </article>
-          <article class="score-card score-human">
-            <div class="score-title">Human Indicators</div>
+          <article class="score-card score-human" id="humanCard">
+            <div class="score-title">Human</div>
             <div id="humanScore" class="score-value">-</div>
           </article>
-          <article class="score-card score-garbage">
-            <div class="score-title">Unidentified Indicators</div>
+          <article class="score-card score-garbage" id="otherCard">
+            <div class="score-title">Other</div>
             <div id="garbageScore" class="score-value">-</div>
           </article>
         </div>
 
         <div class="meta">
+          <div id="progressStrip" class="progress-strip" aria-live="polite">
+            <span class="progress-spinner" aria-hidden="true"></span>
+            <span id="progressLabel">Analysing...</span>
+          </div>
           <div id="novelty" class="status status-warn">No result yet.</div>
           <div id="simhashLine" class="hint">Simhash: -</div>
           <div id="skipLine" class="hint">Skip reason: -</div>
+          <div id="scoreBreakdown" class="breakdown">
+            <div class="breakdown-title">Score contributions</div>
+            <div class="hint">Waiting for a result.</div>
+          </div>
         </div>
       </div>
 
@@ -360,7 +429,8 @@
 
     const state = {
       ws: null,
-      captchaAnswer: null
+      lastResponse: null,
+      reconnectTimer: null
     };
 
     const els = {
@@ -369,17 +439,19 @@
       connectionBadge: document.getElementById("connectionBadge"),
       textInput: document.getElementById("textInput"),
       charCounter: document.getElementById("charCounter"),
-      captchaQuestion: document.getElementById("captchaQuestion"),
-      captchaInput: document.getElementById("captchaInput"),
-      newCaptchaBtn: document.getElementById("newCaptchaBtn"),
+      wordCounter: document.getElementById("wordCounter"),
+      hpWebsite: document.getElementById("hpWebsite"),
+      hpCompany: document.getElementById("hpCompany"),
       analyzeBtn: document.getElementById("analyzeBtn"),
       clearBtn: document.getElementById("clearBtn"),
+      shortSampleWarning: document.getElementById("shortSampleWarning"),
       aiScore: document.getElementById("aiScore"),
       humanScore: document.getElementById("humanScore"),
       garbageScore: document.getElementById("garbageScore"),
       novelty: document.getElementById("novelty"),
       simhashLine: document.getElementById("simhashLine"),
       skipLine: document.getElementById("skipLine"),
+      scoreBreakdown: document.getElementById("scoreBreakdown"),
       rawOutput: document.getElementById("rawOutput")
     };
 
@@ -388,12 +460,26 @@
       els.connectionBadge.className = `status status-${kind}`;
     }
 
-    function generateCaptcha() {
-      const a = Math.floor(Math.random() * 8) + 1;
-      const b = Math.floor(Math.random() * 8) + 1;
-      state.captchaAnswer = a + b;
-      els.captchaQuestion.textContent = `Solve: ${a} + ${b} = ?`;
-      els.captchaInput.value = "";
+    const STEP_LABELS = {
+      pass1_similarity:   "Pass 1: Checking for similar submissions...",
+      pass2_garbage:      "Pass 2: Running garbage detection...",
+      pass3_construction: "Pass 3: Running construction analysis...",
+    };
+
+    function showProgress(step) {
+      const label = STEP_LABELS[step] || `Running ${step}...`;
+      document.getElementById("progressLabel").textContent = label;
+      document.getElementById("progressStrip").classList.add("visible");
+    }
+
+    function clearProgress() {
+      document.getElementById("progressStrip").classList.remove("visible");
+    }
+
+    function setAnalysing(active) {
+      els.analyzeBtn.disabled = active;
+      els.analyzeBtn.textContent = active ? "Analysing…" : "Analyse Text";
+      if (!active) clearProgress();
     }
 
     function updateCounter() {
@@ -402,6 +488,7 @@
         els.textInput.value = value;
       }
       els.charCounter.textContent = `${value.length} / ${MAX_CHARS}`;
+      els.wordCounter.textContent = `${countWords(value)} word${countWords(value) === 1 ? "" : "s"}`;
     }
 
     function clampScore(v) {
@@ -409,6 +496,16 @@
         return "-";
       }
       return String(Math.max(0, Math.min(999, Math.round(v))));
+    }
+
+    function countWords(text) {
+      const matches = text.trim().match(/[\p{L}\p{N}']+/gu);
+      return matches ? matches.length : 0;
+    }
+
+    function updateShortSampleWarning(text) {
+      const isShort = countWords(text) < 200;
+      els.shortSampleWarning.style.display = isShort ? "block" : "none";
     }
 
     // Deterministic 64-bit SimHash from token hashes using BigInt operations.
@@ -456,6 +553,11 @@
         return;
       }
 
+      if (state.reconnectTimer) {
+        clearTimeout(state.reconnectTimer);
+        state.reconnectTimer = null;
+      }
+
       if (state.ws && state.ws.readyState <= 1) {
         state.ws.close();
       }
@@ -466,12 +568,29 @@
 
       ws.onopen = () => setStatus("Socket connected", "ok");
       ws.onerror = () => setStatus("Socket error", "error");
-      ws.onclose = () => setStatus("Socket disconnected", "warn");
+      ws.onclose = () => {
+        if (state.ws !== ws) {
+          return;
+        }
+
+        setStatus("Socket disconnected", "warn");
+        state.reconnectTimer = setTimeout(() => {
+          if (state.ws === ws) {
+            connectSocket();
+          }
+        }, 500);
+      };
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          renderResponse(data);
+          if (data.type === "progress") {
+            showProgress(data.step);
+          } else {
+            setAnalysing(false);
+            renderResponse(data);
+          }
         } catch (_err) {
+          setAnalysing(false);
           els.rawOutput.textContent = String(event.data);
           setStatus("Received non-JSON response", "error");
         }
@@ -479,7 +598,14 @@
     }
 
     function renderResponse(payload) {
+      state.lastResponse = payload;
+      sessionStorage.setItem("solidocto:lastResponse", JSON.stringify(payload));
       els.rawOutput.textContent = JSON.stringify(payload, null, 2);
+
+      // Remove highlight from all
+      document.getElementById("aiCard").style.boxShadow = "none";
+      document.getElementById("humanCard").style.boxShadow = "none";
+      document.getElementById("otherCard").style.boxShadow = "none";
 
       if (payload.error) {
         els.aiScore.textContent = "-";
@@ -490,9 +616,25 @@
         return;
       }
 
-      els.aiScore.textContent = clampScore(payload.ai_count);
-      els.humanScore.textContent = clampScore(payload.human_score);
-      els.garbageScore.textContent = clampScore(payload.garbage_score);
+      const ai = typeof payload.ai_count === "number" ? payload.ai_count : 0;
+      const human = typeof payload.human_score === "number" ? payload.human_score : 0;
+      const other = typeof payload.garbage_score === "number" ? payload.garbage_score : 0;
+
+      els.aiScore.textContent = clampScore(ai);
+      els.humanScore.textContent = clampScore(human);
+      els.garbageScore.textContent = clampScore(other);
+
+      // Highlight the highest
+      const max = Math.max(ai, human, other);
+      if (max > 0) {
+        if (ai === max) {
+          document.getElementById("aiCard").style.boxShadow = "0 0 0 2px var(--accent)";
+        } else if (human === max) {
+          document.getElementById("humanCard").style.boxShadow = "0 0 0 2px var(--good)";
+        } else {
+          document.getElementById("otherCard").style.boxShadow = "0 0 0 2px var(--bad)";
+        }
+      }
 
       const novel = payload.novel_text;
       const reused = payload.reused_result;
@@ -509,6 +651,57 @@
 
       els.simhashLine.textContent = `Simhash: ${payload.simhash || "-"}`;
       els.skipLine.textContent = `Skip reason: ${payload.skip_reason || "-"}`;
+
+      renderScoreBreakdown(payload);
+    }
+
+    function renderScoreBreakdown(payload) {
+      const contributions = Array.isArray(payload.score_contributions) ? payload.score_contributions : [];
+      const totals = payload.score_totals || null;
+      const displayedTotals = {
+        ai: typeof payload.ai_count === "number" ? payload.ai_count : 0,
+        human: typeof payload.human_score === "number" ? payload.human_score : 0,
+        garbage: typeof payload.garbage_score === "number" ? payload.garbage_score : 0,
+      };
+
+      if (!contributions.length) {
+        const totalLine = totals
+          ? `Raw totals (before fuzz) - AI: ${totals.ai ?? 0}, Human: ${totals.human ?? 0}, Garbage: ${totals.garbage ?? 0}`
+          : "No contribution details available.";
+        els.scoreBreakdown.innerHTML = `
+          <div class="breakdown-title">Score contributions</div>
+          <div class="hint">Displayed totals - AI: ${escapeHtml(String(displayedTotals.ai))}, Human: ${escapeHtml(String(displayedTotals.human))}, Other: ${escapeHtml(String(displayedTotals.garbage))}</div>
+          <div class="hint">${escapeHtml(totalLine)}</div>
+        `;
+        return;
+      }
+
+      const lines = contributions.map((item) => {
+        const amount = typeof item.amount === "number" ? item.amount : 0;
+        const source = item.source || "unknown";
+        const score = item.score || "unknown";
+        return `<div class="hint">${escapeHtml(score.toUpperCase())} +${escapeHtml(String(amount))} from ${escapeHtml(source)}</div>`;
+      }).join("");
+
+      const totalLine = totals
+        ? `<div class="hint">Raw totals (before fuzz) - AI: ${escapeHtml(String(totals.ai ?? 0))}, Human: ${escapeHtml(String(totals.human ?? 0))}, Garbage: ${escapeHtml(String(totals.garbage ?? 0))}</div>`
+        : "";
+
+      els.scoreBreakdown.innerHTML = `
+        <div class="breakdown-title">Score contributions</div>
+        <div class="hint">Displayed totals - AI: ${escapeHtml(String(displayedTotals.ai))}, Human: ${escapeHtml(String(displayedTotals.human))}, Other: ${escapeHtml(String(displayedTotals.garbage))}</div>
+        ${lines}
+        ${totalLine}
+      `;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
     }
 
     function analyseText() {
@@ -523,31 +716,39 @@
         return;
       }
 
-      const answer = Number(els.captchaInput.value.trim());
-      if (!Number.isFinite(answer) || answer !== state.captchaAnswer) {
-        setStatus("Captcha answer is incorrect", "error");
+      updateShortSampleWarning(text);
+
+      const hpWebsite = els.hpWebsite.value.trim();
+      const hpCompany = els.hpCompany.value.trim();
+      if (hpWebsite || hpCompany) {
+        setStatus("Submission blocked", "error");
         return;
       }
 
       const payload = {
         text,
-        captcha_token: `math:${Date.now()}`,
         datetimeUTC: new Date().toISOString(),
-        simhash: computeSimhash64(text)
+        simhash: computeSimhash64(text),
+        hp_website: hpWebsite,
+        hp_company: hpCompany
       };
 
       try {
         state.ws.send(JSON.stringify(payload));
-        setStatus("Request sent", "ok");
+        setAnalysing(true);
+        setStatus("Analysing...", "warn");
       } catch (_err) {
         setStatus("Failed to send request", "error");
       }
-
-      generateCaptcha();
     }
 
     function clearForm() {
       els.textInput.value = "";
+      els.hpWebsite.value = "";
+      els.hpCompany.value = "";
+      els.shortSampleWarning.style.display = "none";
+      state.lastResponse = null;
+      sessionStorage.removeItem("solidocto:lastResponse");
       updateCounter();
       els.aiScore.textContent = "-";
       els.humanScore.textContent = "-";
@@ -556,18 +757,33 @@
       els.novelty.className = "status status-warn";
       els.simhashLine.textContent = "Simhash: -";
       els.skipLine.textContent = "Skip reason: -";
+      els.scoreBreakdown.innerHTML = `
+        <div class="breakdown-title">Score contributions</div>
+        <div class="hint">Waiting for a result.</div>
+      `;
       els.rawOutput.textContent = "{}";
-      generateCaptcha();
     }
 
-    els.textInput.addEventListener("input", updateCounter);
+    els.textInput.addEventListener("input", () => {
+      updateCounter();
+      updateShortSampleWarning(els.textInput.value);
+    });
     els.connectBtn.addEventListener("click", connectSocket);
-    els.newCaptchaBtn.addEventListener("click", generateCaptcha);
     els.analyzeBtn.addEventListener("click", analyseText);
     els.clearBtn.addEventListener("click", clearForm);
 
     updateCounter();
-    generateCaptcha();
+    updateShortSampleWarning(els.textInput.value);
+
+    const savedResponse = sessionStorage.getItem("solidocto:lastResponse");
+    if (savedResponse) {
+      try {
+        const parsed = JSON.parse(savedResponse);
+        renderResponse(parsed);
+      } catch (_err) {
+        sessionStorage.removeItem("solidocto:lastResponse");
+      }
+    }
   </script>
 </body>
 </html>

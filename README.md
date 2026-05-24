@@ -5,7 +5,12 @@ On a webpage, a user can paste in a section of text. Unicode is accepted, but fo
 
 The section of text will be fixed to prevent overflows (1023 characters).
 
-The user will then press submit, and respond to a capture.
+The user will then press submit.
+
+Captcha can be toggled with configuration for testing versus production:
+
+- app.require_captcha: false (default for local testing)
+- app.require_captcha: true (require non-empty captcha_token)
 
 The system will demonstate an set of activities, such as:
 
@@ -67,11 +72,77 @@ The report will also fuzz slightly the results to ensure the markers cannot be f
             - look at fraction of those works from the submission words
                 - if % of works not from common list is < 30% add 100 garbage
                 - if % of words not from common list is < 15%, garbage = 999, skip all further tests
+        - add option to ignore capitalised words and initialisations in ratio calculator
+    6. Line-Length variance
+        - calc the SD of sentence lengths
+        - minimum 3 lines. 
+        - SD lt 2: +1 AI, +1 garbage
+        - SD gt 3 lt 9: +1 AI, +1 human
+        - SD gt 9: +1 garbage
+    7. Character-bigram frequency
+        - using the bigrams.json file, look at the frequency of bigrams in submitted text
+        - if the distribution in the sample does not have a similar distro - it's uniform, or spikes
+            - calculated a KL-divergance 
+                - if lt 0.1 - +1 AI +1 Hum
+                - if gt 0.2 lt 0.3 - +1 garbage, +2 AI
+                - if gt 0.3 lt 0.6 - +2 garbage, +3 AI
+                - if gt 0.6 lt 1 - +10 garbage
+                - if gt 1 - 999 garbage
+
+### Pass 3: Construction Tests
+    The construction tests load the sample text into small local NLP model. It looks to semantic and linguistic features.
+    The model should be only around 100-300 dimensions.
+    Embedding + POS + LM
+
+    1. semantics coherence test
+        - this is sentence to sentence symantic drift.
+        - compute embeddings for each sentence
+        - cosine simularity
+        - if simularity is lt 0.2 for 50% of the sentence pairs - garbage +10
+    2. topic persistence
+        - if the number of clusters is gt than half the number of sentences - garbage +10
+        - if the number of clusters is gt 75% the number of sentences - garbage + 20
+    3. embedding variance
+        - very low lt 0.05 - AI +10
+        - mod low gte 0.05 lt 0.1 - AI +5
+        - human gte 0.1, lt 0.25 - Human +5
+        - mod high gte 0.25, lt 0.35, human +1, garbage +5
+        - very high gte 0.35 - garbage +10
+    4. marker presence vs clause structure
+        - requires a small dependancy parser, like spaCy-mini
+        - markers are because, however, therefore, although
+        - if no subortinate cause, or clause is empty, or main caluse is missing - AI +5
+        - tag as marker misuse
+    5. symantic relationship check
+        - for "because" marker (see 4 above), check the embedding (clause) is related to the embedding (effect)
+            - if the cosine simularity is lt 0.2, then AI +5, garbage +10
+            - if gte 0.2 lt 0.3, then AI +5, garbage +5
+            - gte 0.3, human +5, AI +5
+        - for "however" marker (see 4 above), embedding(A) and embedding(B) should be related but contrasting
+            - if the simularity is lt 0.1, then AI +1, garbage +10
+            - if gte 0.1 lt 0.2, then AI +1, garbage +5
+            - if gte 0.2 lt 0.6, then AI +2, human +3
+            - gte 0.8, garbage +5, AI +5
+        - for "therefore" marker (see 4 above), premise → conclusion should be strongly related
+            - if the simularity is gt 0.4 then AI +2, human +5
+            - if lte 0.4 then garbage +5, AI+2
+        - for "although" marker (see 4 above), concession and main clause should be related but not identical
+            - if the simularity is lt 0.2, AI +5, garbage +5
+            - if the simularity is gte 0.2 lt 0.6, human +5, AI +2
+            - if gte 0.6 then garbage +5, AI +5
+    6. marker spirals because, however, therefore, although
+        - if the frequency of markers is gt 1 per sentence, then AI +2
+        - if two diff markers apear in the same sentence, then AI +2
+        - if three different markers appear in the sample text then AI +4
 
 
-### Pass 3: AI detector
 
-### Pass 4: Human detector
+
+     
+
+### Pass 4: AI detector
+
+### Pass 5: Human detector
 
 
 
@@ -164,6 +235,9 @@ Techology stack
    |        | - Human
    |        |    | - human.yaml
    |             | - human_tests.py
+   |        | - construction
+   |             | - construction.yaml
+   |             | - construction_tests.py
    |     | - reporter
    |        | - report.yaml
    |        | - report_gen.py
@@ -232,10 +306,14 @@ The front-end calculates a simhash just to verify the return JSON is the same re
 ### Request
 {
   "text": "string",
-  "captcha_token": "string",
-  "datetimeUTC" : "string"
-  "simhash" : "string"
+    "captcha_token": "string (optional unless app.require_captcha=true)",
+    "datetimeUTC" : "string",
+    "simhash" : "string",
+    "hp_website": "string (hidden honeypot; must stay empty)",
+    "hp_company": "string (hidden honeypot; must stay empty)"
 }
+
+If honeypot fields are non-empty, the backend rejects the request as bot-like traffic.
 
 ### Response
 {

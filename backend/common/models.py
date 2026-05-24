@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 
@@ -23,6 +23,7 @@ class PipelineContext:
     computed_simhash_hex: str
     submitted_simhash: str | None
     score: ScoreState
+    score_contributions: list[dict[str, Any]] = field(default_factory=list)
     novel_text: bool = True
     reused_result: bool = False
     skip_reason: str | None = None
@@ -32,7 +33,7 @@ class PipelineContext:
 @dataclass
 class RequestPayload:
     text: str
-    captcha_token: str
+    captcha_token: str | None
     datetimeUTC: str
     simhash: str | None
 

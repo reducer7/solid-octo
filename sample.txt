@@ -1,0 +1,3 @@
+The system takes in some text and looks at it step by step. It checks how the words are used, how the lines are built, and how the ideas move from one part to the next. Each part of the process has a clear rule, and the rules work in the same way every time.
+
+The style stays flat and even. The lines are short, the ideas are clear, and the tone does not change much. There are no strong feelings or personal stories. The goal is to give a clean and simple form that is easy to read and easy to follow.

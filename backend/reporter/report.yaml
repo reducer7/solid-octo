@@ -3,3 +3,5 @@ report:
   include_reuse_flag: true
   fuzz_scores: true
   hide_marker_details: true
+  submission_logging_enabled: true
+  submission_log_path: backend/reporter/submission_log.jsonl

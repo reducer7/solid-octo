@@ -27,17 +27,22 @@ def load_engine_config(project_root: Path) -> dict[str, Any]:
     root_cfg = _load_yaml(project_root / "config.yaml")
     similar_cfg = _load_yaml(project_root / "backend" / "tests" / "similarity" / "similar.yaml")
     garbage_cfg = _load_yaml(project_root / "backend" / "tests" / "garbage" / "garbage.yaml")
+    construction_cfg = _load_yaml(
+        project_root / "backend" / "tests" / "construction" / "construction.yaml"
+    )
     report_cfg = _load_yaml(project_root / "backend" / "reporter" / "report.yaml")
 
     _validate_root(root_cfg)
     _validate_similarity(similar_cfg)
     _validate_garbage(garbage_cfg)
+    _validate_construction(construction_cfg)
     _validate_report(report_cfg)
 
     return {
         "root": root_cfg,
         "similarity": similar_cfg["similarity"],
         "garbage": garbage_cfg["garbage"],
+        "construction": construction_cfg["construction"],
         "report": report_cfg["report"],
     }
 
@@ -57,10 +62,10 @@ def _validate_root(cfg: dict[str, Any]) -> None:
     redis = _require(cfg, "redis", "config.yaml")
     fuzz = _require(cfg, "fuzz", "config.yaml")
 
-    for key in ("max_text_length", "simhash_bits", "scoring_max", "schema_version"):
+    for key in ("max_text_length", "simhash_bits", "scoring_max", "schema_version", "require_captcha"):
         _require(app, key, "config.yaml.app")
 
-    for key in ("url", "similarity_index_key", "entry_key_prefix", "fallback_bucket_key"):
+    for key in ("enabled", "url", "similarity_index_key", "entry_key_prefix", "fallback_bucket_key"):
         _require(redis, key, "config.yaml.redis")
 
     for key in ("enabled", "max_jitter", "bucket_hours"):
@@ -75,8 +80,22 @@ def _validate_similarity(cfg: dict[str, Any]) -> None:
 
 def _validate_garbage(cfg: dict[str, Any]) -> None:
     garbage = _require(cfg, "garbage", "garbage.yaml")
-    for key in ("entropy", "repeated_char_density", "non_printable_density", "unicode_outliers", "word_salad"):
+    for key in ("entropy", "repeated_char_density", "non_printable_density", "unicode_outliers", "word_salad", "bigram"):
         _require(garbage, key, "garbage.yaml.garbage")
+
+
+def _validate_construction(cfg: dict[str, Any]) -> None:
+    construction = _require(cfg, "construction", "construction.yaml")
+    for key in (
+        "model",
+        "semantic_coherence",
+        "topic_persistence",
+        "embedding_variance",
+        "marker_clause",
+        "semantic_marker",
+        "marker_spiral",
+    ):
+        _require(construction, key, "construction.yaml.construction")
 
 
 def _validate_report(cfg: dict[str, Any]) -> None:

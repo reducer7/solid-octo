@@ -3,19 +3,21 @@ app:
   simhash_bits: 64
   scoring_max: 999
   schema_version: 1
+  require_captcha: false
 
 websocket:
   host: 127.0.0.1
   port: 8765
 
 redis:
+  enabled: true
   url: redis://localhost:6379/0
   similarity_index_key: solidocto:lsh
   entry_key_prefix: solidocto:entry
   fallback_bucket_key: solidocto:simhashes
 
 fuzz:
-  enabled: true
+  enabled: false
   max_jitter: 3
   bucket_hours: 24
 
