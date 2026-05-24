@@ -14,6 +14,8 @@ from backend.reporter.submission_log import append_submission_log
 from backend.reporter.report_gen import generate_response
 from backend.tests.garbage.garbage_tests import run_garbage_pass
 from backend.tests.construction.construction_tests import run_construction_pass
+from backend.tests.ai.ai_tests import run_ai_pass
+from backend.tests.human.human_tests import run_human_pass
 from backend.tests.similarity.similar import run_similarity_pass
 
 
@@ -31,6 +33,7 @@ def process_submission(
     root_cfg = config["root"]
     app_cfg = root_cfg["app"]
     redis_cfg = root_cfg["redis"]
+    highlight_spelling = bool(app_cfg.get("highlight_spelling", False))
 
     payload = _parse_request(raw_request, require_captcha=bool(app_cfg["require_captcha"]))
     text = _normalize_and_trim(payload.text, int(app_cfg["max_text_length"]))
@@ -47,13 +50,16 @@ def process_submission(
         score=ScoreState(),
     )
 
-    _notify(on_progress, "pass1_similarity")
-    reused = run_similarity_pass(
-        ctx=ctx,
-        store=store,
-        similarity_cfg=config["similarity"],
-        redis_cfg=redis_cfg,
-    )
+    check_similarity = bool(app_cfg.get("check_similarity", True))
+    reused = False
+    if check_similarity:
+        _notify(on_progress, "pass1_similarity")
+        reused = run_similarity_pass(
+            ctx=ctx,
+            store=store,
+            similarity_cfg=config["similarity"],
+            redis_cfg=redis_cfg,
+        )
 
     if not reused:
         _notify(on_progress, "pass2_garbage")
@@ -71,6 +77,19 @@ def process_submission(
                 max_score=int(app_cfg["scoring_max"]),
                 project_root=project_root,
             )
+            _notify(on_progress, "pass4_ai")
+            run_ai_pass(
+                ctx=ctx,
+                ai_cfg=config["ai_detector"],
+                max_score=int(app_cfg["scoring_max"]),
+            )
+            _notify(on_progress, "pass5_human")
+            run_human_pass(
+                ctx=ctx,
+                human_cfg=config["human_detector"],
+                max_score=int(app_cfg["scoring_max"]),
+                collect_spelling_debug=highlight_spelling,
+            )
         _persist_new_result(
             ctx=ctx,
             store=store,
@@ -84,8 +103,9 @@ def process_submission(
         report_cfg=config["report"],
         fuzz_cfg=root_cfg["fuzz"],
         max_score=int(app_cfg["scoring_max"]),
+        include_spelling_debug=highlight_spelling,
     )
-    _log_submission(ctx, raw_request, config["report"], project_root)
+    _log_submission(ctx, raw_request, config["report"], project_root, check_similarity)
     return response
 
 
@@ -94,15 +114,18 @@ def _log_submission(
     raw_request: dict[str, Any],
     report_cfg: dict[str, Any],
     project_root: Path,
+    check_similarity: bool = True,
 ) -> None:
     if not bool(report_cfg.get("submission_logging_enabled", False)):
         return
 
-    triggered_tests = ["similarity"]
+    triggered_tests = ["similarity"] if check_similarity else []
     if not ctx.reused_result:
         triggered_tests.append("garbage")
         if not ctx.terminal:
             triggered_tests.append("construction")
+            triggered_tests.append("ai")
+            triggered_tests.append("human")
 
     append_submission_log(
         project_root=project_root,

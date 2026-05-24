@@ -24,6 +24,7 @@ class PipelineContext:
     submitted_simhash: str | None
     score: ScoreState
     score_contributions: list[dict[str, Any]] = field(default_factory=list)
+    spelling_debug: list[dict[str, Any]] = field(default_factory=list)
     novel_text: bool = True
     reused_result: bool = False
     skip_reason: str | None = None

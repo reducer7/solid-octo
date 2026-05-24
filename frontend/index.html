@@ -16,6 +16,7 @@
       --accent-2: #f06b24;
       --good: #1f8f57;
       --bad: #b3261e;
+      --other: #6f7488;
       --radius: 10px;
       --shadow: 0 8px 20px rgba(0, 25, 70, 0.10);
     }
@@ -121,10 +122,47 @@
     }
 
     textarea {
-      resize: vertical;
-      min-height: 70px;
+      display: block;
+      width: 100%;
+      resize: both;
+      min-height: 110px;
       max-height: 160px;
       line-height: 1.3;
+    }
+
+    .text-overlay-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .text-overlay-wrap textarea {
+      position: relative;
+      z-index: 2;
+      background: transparent;
+    }
+
+    .text-highlight-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font: inherit;
+      line-height: 1.3;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      color: transparent;
+    }
+
+    .spelling-mark {
+      background: rgba(240, 107, 36, 0.3);
+      border-radius: 3px;
+      box-shadow: inset 0 -1px 0 rgba(122, 66, 31, 0.5);
+      color: transparent;
     }
 
     .counter {
@@ -196,19 +234,24 @@
     .results {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
+      gap: 4px;
     }
 
     .score-card {
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 6px;
+      padding: 5px 6px;
       background: #fff;
-      min-height: 60px;
+      min-height: 52px;
+      transition: opacity 0.2s;
+    }
+
+    .score-card--dimmed {
+      opacity: 0.35;
     }
 
     .score-title {
-      font-size: 0.7rem;
+      font-size: 0.66rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -216,8 +259,8 @@
     }
 
     .score-value {
-      margin-top: 4px;
-      font-size: 1.2rem;
+      margin-top: 3px;
+      font-size: 1.05rem;
       font-weight: 800;
       line-height: 1;
     }
@@ -231,7 +274,7 @@
     }
 
     .score-garbage .score-value {
-      color: var(--bad);
+      color: var(--other);
     }
 
     .meta {
@@ -323,6 +366,113 @@
       to { transform: rotate(360deg); }
     }
 
+    .donut-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 0 2px;
+      gap: 4px;
+    }
+
+    .donut-track {
+      fill: none;
+      stroke: rgba(41, 48, 84, 0.09);
+      stroke-width: 14;
+    }
+
+    .donut-inner-track {
+      fill: none;
+      stroke: rgba(41, 48, 84, 0.08);
+      stroke-width: 6;
+    }
+
+    .donut-seg {
+      fill: none;
+      stroke-width: 14;
+      stroke-linecap: butt;
+      transform-origin: 50% 50%;
+      transform: rotate(-90deg);
+      transition: stroke-dasharray 0.45s ease, stroke-dashoffset 0.45s ease;
+    }
+
+    .donut-inner-seg {
+      fill: none;
+      stroke-width: 6;
+      stroke-linecap: butt;
+      transform-origin: 50% 50%;
+      transform: rotate(-90deg);
+      transition: stroke-dasharray 0.45s ease, stroke-dashoffset 0.45s ease;
+    }
+
+    .donut-ai      { stroke: #1358d8; }
+    .donut-human   { stroke: #1f8f57; }
+    .donut-garbage { stroke: var(--other); }
+
+    .donut-center-main {
+      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      fill: #1b1a24;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    .donut-center-sub {
+      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      fill: #5a5f73;
+      text-anchor: middle;
+      dominant-baseline: central;
+      letter-spacing: 0.06em;
+    }
+
+    .donut-outer-tag-pill {
+      fill: var(--other);
+      opacity: 0.96;
+    }
+
+    .donut-outer-tag {
+      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+      font-size: 7px;
+      font-weight: 700;
+      fill: #ffffff;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .donut-legend {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 700;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .donut-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .donut-legend-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .donut-legend-dot.donut-ai      { background: #1358d8; }
+    .donut-legend-dot.donut-human   { background: #1f8f57; }
+    .donut-legend-dot.donut-garbage { background: var(--other); }
+
     @media (max-width: 840px) {
       .results {
         grid-template-columns: 1fr;
@@ -339,7 +489,7 @@
     <header class="topbar">
       <div>
         <div class="brand">Solidocto</div>
-        <div class="tag">Know your text. Test harness UI for pass 1 and pass 2.</div>
+        <div class="tag">Know your text. Human or AI?</div>
       </div>
       <div id="connectionBadge" class="status status-warn">Socket not connected</div>
     </header>
@@ -361,7 +511,10 @@
       <div class="panel">
         <div class="field">
           <label for="textInput">Input Text</label>
-          <textarea id="textInput" maxlength="1023" placeholder="Paste up to 1023 characters... Unicode is accepted."></textarea>
+          <div class="text-overlay-wrap">
+            <div id="textHighlightLayer" class="text-highlight-layer" aria-hidden="true"></div>
+            <textarea id="textInput" maxlength="1023" placeholder="Paste up to 1023 characters... Unicode is accepted."></textarea>
+          </div>
           <div id="charCounter" class="counter">0 / 1023</div>
           <div id="wordCounter" class="word-counter">0 words</div>
         </div>
@@ -376,10 +529,10 @@
         <div class="actions">
           <div>
             <div class="hint">Frontend sends: text, datetimeUTC, simhash.</div>
-            <div id="shortSampleWarning" class="hint-warning">Short samples may stack 'Other' indicators</div>
+            <div id="shortSampleWarning" class="hint-warning">Short samples will have inaccurate results and will trigger "other" indicators.</div>
           </div>
           <div style="display:flex; gap:8px;">
-            <button id="analyzeBtn" class="btn-primary" type="button">Analyse Text</button>
+            <button id="analyzeBtn" class="btn-primary" type="button">Analyze Text</button>
             <button id="clearBtn" class="btn-secondary" type="button">Clear</button>
           </div>
         </div>
@@ -397,9 +550,31 @@
             <div id="humanScore" class="score-value">-</div>
           </article>
           <article class="score-card score-garbage" id="otherCard">
-            <div class="score-title">Other</div>
+            <div class="score-title">Other or undetermined</div>
             <div id="garbageScore" class="score-value">-</div>
           </article>
+        </div>
+
+        <div class="donut-wrap">
+          <svg id="donutChart" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Score distribution">
+            <circle id="donutOuterBase"    class="donut-seg donut-garbage" cx="60" cy="60" r="46" style="stroke-dasharray: 0 289"/>
+            <circle id="donutOuterHumanAi" class="donut-seg donut-human"   cx="60" cy="60" r="46" style="stroke-dasharray: 0 289"/>
+            <circle id="donutOuterAi"      class="donut-seg donut-ai"      cx="60" cy="60" r="46" style="stroke-dasharray: 0 289"/>
+            <circle class="donut-inner-track" cx="60" cy="60" r="31"/>
+            <circle id="donutInnerAi"    class="donut-inner-seg donut-ai"    cx="60" cy="60" r="31" style="stroke-dasharray: 0 195"/>
+            <circle id="donutInnerHuman" class="donut-inner-seg donut-human" cx="60" cy="60" r="31" style="stroke-dasharray: 0 195"/>
+            <g id="donutOuterTag" transform="translate(60 29)">
+              <rect class="donut-outer-tag-pill" x="0" y="0" rx="5" ry="5" width="44" height="11"></rect>
+              <text id="donutOuterTagText" class="donut-outer-tag" x="22" y="6">OTHER 0</text>
+            </g>
+            <text id="donutLabel" class="donut-center-main" x="60" y="56">—</text>
+            <text id="donutSub"   class="donut-center-sub"  x="60" y="71">NO RESULT</text>
+          </svg>
+          <div class="donut-legend">
+            <span class="donut-legend-item"><span class="donut-legend-dot donut-ai"></span>AI</span>
+            <span class="donut-legend-item"><span class="donut-legend-dot donut-human"></span>Human</span>
+            <span class="donut-legend-item"><span class="donut-legend-dot donut-garbage"></span>Other</span>
+          </div>
         </div>
 
         <div class="meta">
@@ -425,12 +600,20 @@
   </main>
 
   <script>
-    const MAX_CHARS = 1023;
+    const DEFAULT_MAX_CHARS = 1023;
 
     const state = {
       ws: null,
       lastResponse: null,
-      reconnectTimer: null
+      reconnectTimer: null,
+      pendingText: null,
+      progressQueue: [],
+      progressTimer: null,
+      pendingResponse: null,
+      progressMinMs: 150,
+      maxChars: DEFAULT_MAX_CHARS,
+      highlightSpelling: false,
+      spellingRanges: [],
     };
 
     const els = {
@@ -438,6 +621,7 @@
       connectBtn: document.getElementById("connectBtn"),
       connectionBadge: document.getElementById("connectionBadge"),
       textInput: document.getElementById("textInput"),
+      textHighlightLayer: document.getElementById("textHighlightLayer"),
       charCounter: document.getElementById("charCounter"),
       wordCounter: document.getElementById("wordCounter"),
       hpWebsite: document.getElementById("hpWebsite"),
@@ -476,19 +660,144 @@
       document.getElementById("progressStrip").classList.remove("visible");
     }
 
+    // Drain the progress queue at 150 ms per step, then render the response.
+    function _flushProgress() {
+      state.progressTimer = null;
+      if (state.progressQueue.length > 0) {
+        showProgress(state.progressQueue.shift());
+        state.progressTimer = setTimeout(_flushProgress, state.progressMinMs);
+      } else if (state.pendingResponse !== null) {
+        const response = state.pendingResponse;
+        state.pendingResponse = null;
+        setAnalysing(false);
+        const restoreText = state.pendingText ?? localStorage.getItem("solidocto:inputText");
+        if (restoreText !== null && els.textInput.value === "") {
+          els.textInput.value = restoreText;
+          updateCounter();
+        }
+        state.pendingText = null;
+        renderResponse(response);
+      }
+    }
+
     function setAnalysing(active) {
       els.analyzeBtn.disabled = active;
       els.analyzeBtn.textContent = active ? "Analysing…" : "Analyse Text";
-      if (!active) clearProgress();
+      ["aiCard", "humanCard", "otherCard"].forEach(id =>
+        document.getElementById(id).classList.toggle("score-card--dimmed", active)
+      );
+      if (!active) {
+        clearProgress();
+        if (state.ws && state.ws.readyState === WebSocket.OPEN) {
+          setStatus("Socket connected", "ok");
+        }
+      }
     }
 
     function updateCounter() {
-      const value = els.textInput.value.slice(0, MAX_CHARS);
+      const value = els.textInput.value.slice(0, state.maxChars);
       if (value !== els.textInput.value) {
         els.textInput.value = value;
       }
-      els.charCounter.textContent = `${value.length} / ${MAX_CHARS}`;
+      els.charCounter.textContent = `${value.length} / ${state.maxChars}`;
       els.wordCounter.textContent = `${countWords(value)} word${countWords(value) === 1 ? "" : "s"}`;
+      renderTextHighlights();
+    }
+
+    function applyUiConfig(configPayload) {
+      if (typeof configPayload.maxTextLength === "number" && Number.isFinite(configPayload.maxTextLength)) {
+        const nextMax = Math.max(1, Math.floor(configPayload.maxTextLength));
+        state.maxChars = nextMax;
+        els.textInput.maxLength = nextMax;
+        els.textInput.placeholder = `Paste up to ${nextMax} characters... Unicode is accepted.`;
+      }
+      if (typeof configPayload.progressDisplayMs === "number") {
+        state.progressMinMs = configPayload.progressDisplayMs;
+      }
+      if (typeof configPayload.highlightSpelling === "boolean") {
+        state.highlightSpelling = configPayload.highlightSpelling;
+        if (!state.highlightSpelling) {
+          state.spellingRanges = [];
+        }
+      }
+      updateCounter();
+    }
+
+    function normalizeSpellingRanges(ranges, maxLen) {
+      if (!Array.isArray(ranges) || maxLen <= 0) {
+        return [];
+      }
+
+      const cleaned = [];
+      for (const item of ranges) {
+        if (!item || typeof item.start !== "number" || typeof item.end !== "number") {
+          continue;
+        }
+        const start = Math.max(0, Math.min(maxLen, Math.floor(item.start)));
+        const end = Math.max(0, Math.min(maxLen, Math.floor(item.end)));
+        if (end <= start) {
+          continue;
+        }
+        cleaned.push({ start, end });
+      }
+
+      cleaned.sort((a, b) => (a.start - b.start) || (a.end - b.end));
+      const merged = [];
+      for (const current of cleaned) {
+        const last = merged[merged.length - 1];
+        if (!last || current.start > last.end) {
+          merged.push({ start: current.start, end: current.end });
+        } else if (current.end > last.end) {
+          last.end = current.end;
+        }
+      }
+      return merged;
+    }
+
+    function syncHighlightScroll() {
+      els.textHighlightLayer.scrollTop = els.textInput.scrollTop;
+      els.textHighlightLayer.scrollLeft = els.textInput.scrollLeft;
+    }
+
+    function syncHighlightGeometry() {
+      // Match the textarea's visible content box so wraps align with scrollbar/resizing.
+      els.textHighlightLayer.style.width = `${els.textInput.clientWidth}px`;
+      els.textHighlightLayer.style.height = `${els.textInput.clientHeight}px`;
+    }
+
+    function renderTextHighlights() {
+      const text = els.textInput.value;
+      const ranges = state.highlightSpelling
+        ? normalizeSpellingRanges(state.spellingRanges, text.length)
+        : [];
+
+      if (!text) {
+        els.textHighlightLayer.innerHTML = "";
+        syncHighlightScroll();
+        return;
+      }
+
+      if (!ranges.length) {
+        els.textHighlightLayer.innerHTML = `${escapeHtml(text)}\n`;
+        syncHighlightScroll();
+        return;
+      }
+
+      const html = [];
+      let cursor = 0;
+      for (const range of ranges) {
+        if (range.start > cursor) {
+          html.push(escapeHtml(text.slice(cursor, range.start)));
+        }
+        html.push(`<mark class="spelling-mark">${escapeHtml(text.slice(range.start, range.end))}</mark>`);
+        cursor = range.end;
+      }
+      if (cursor < text.length) {
+        html.push(escapeHtml(text.slice(cursor)));
+      }
+      html.push("\n");
+      els.textHighlightLayer.innerHTML = html.join("");
+      syncHighlightScroll();
     }
 
     function clampScore(v) {
@@ -584,22 +893,114 @@
         try {
           const data = JSON.parse(event.data);
           if (data.type === "progress") {
-            showProgress(data.step);
+            state.progressQueue.push(data.step);
+            if (state.progressTimer === null) {
+              _flushProgress();
+            }
+          } else if (data.type === "config") {
+            applyUiConfig(data);
           } else {
-            setAnalysing(false);
-            renderResponse(data);
+            state.pendingResponse = data;
+            if (state.progressTimer === null) {
+              _flushProgress();
+            }
           }
         } catch (_err) {
+          clearTimeout(state.progressTimer);
+          state.progressTimer = null;
+          state.progressQueue.length = 0;
+          state.pendingResponse = null;
           setAnalysing(false);
+          state.pendingText = null;
           els.rawOutput.textContent = String(event.data);
           setStatus("Received non-JSON response", "error");
         }
       };
     }
 
+    function renderDonut(ai, human, garbage) {
+      const R = 46;
+      const C = 2 * Math.PI * R;
+      const INNER_R = 31;
+      const INNER_C = 2 * Math.PI * INNER_R;
+      const total = ai + human + garbage;
+      const elLabel = document.getElementById("donutLabel");
+      const elSub   = document.getElementById("donutSub");
+      const elOuterTagText = document.getElementById("donutOuterTagText");
+
+      if (total === 0) {
+        [["donutOuterBase", 0], ["donutOuterHumanAi", 0], ["donutOuterAi", 0]].forEach(([id]) => {
+          const el = document.getElementById(id);
+          el.style.strokeDasharray = `0 ${C}`;
+          el.style.strokeDashoffset = "0";
+        });
+        [["donutInnerAi", 0], ["donutInnerHuman", 0]].forEach(([id]) => {
+          const el = document.getElementById(id);
+          el.style.strokeDasharray = `0 ${INNER_C}`;
+          el.style.strokeDashoffset = "0";
+        });
+        elLabel.textContent = "\u2014";
+        elSub.textContent = "NO RESULT";
+        elOuterTagText.textContent = "OTHER 0";
+        return;
+      }
+
+      elOuterTagText.textContent = `OTHER ${garbage}`;
+
+      // Outer ring (seam-free): draw stacked layers on the same arc.
+      // 1) Base = Other over full circumference
+      // 2) Human+AI overlay from top
+      // 3) AI overlay from top
+      const nonGarbage = ai + human;
+      const nonGarbageLen = (nonGarbage / total) * C;
+      const aiLenOuter = (ai / total) * C;
+
+      const elOuterBase = document.getElementById("donutOuterBase");
+      const elOuterHumanAi = document.getElementById("donutOuterHumanAi");
+      const elOuterAi = document.getElementById("donutOuterAi");
+
+      elOuterBase.style.strokeDasharray = `${C} ${C}`;
+      elOuterBase.style.strokeDashoffset = "0";
+
+      elOuterHumanAi.style.strokeDasharray = `${nonGarbageLen} ${C}`;
+      elOuterHumanAi.style.strokeDashoffset = "0";
+
+      elOuterAi.style.strokeDasharray = `${aiLenOuter} ${C}`;
+      elOuterAi.style.strokeDashoffset = "0";
+
+      const aiHumanTotal = ai + human;
+      if (aiHumanTotal > 0) {
+        const aiLen = (ai / aiHumanTotal) * INNER_C;
+        const humanLen = (human / aiHumanTotal) * INNER_C;
+        const elInnerAi = document.getElementById("donutInnerAi");
+        const elInnerHuman = document.getElementById("donutInnerHuman");
+
+        // Start AI at 12 o'clock and start Human immediately after AI.
+        elInnerAi.style.strokeDasharray = `${aiLen} ${INNER_C}`;
+        elInnerAi.style.strokeDashoffset = "0";
+        elInnerHuman.style.strokeDasharray = `${humanLen} ${INNER_C}`;
+        elInnerHuman.style.strokeDashoffset = String(-aiLen);
+      } else {
+        [["donutInnerAi", 0], ["donutInnerHuman", 0]].forEach(([id]) => {
+          const el = document.getElementById(id);
+          el.style.strokeDasharray = `0 ${INNER_C}`;
+          el.style.strokeDashoffset = "0";
+        });
+      }
+
+      // Center label: always show max of AI vs Human (inner-ring focus).
+      if (ai >= human) {
+        elLabel.textContent = String(ai);
+        elSub.textContent = "AI";
+      } else {
+        elLabel.textContent = String(human);
+        elSub.textContent = "HUMAN";
+      }
+    }
+
     function renderResponse(payload) {
       state.lastResponse = payload;
-      sessionStorage.setItem("solidocto:lastResponse", JSON.stringify(payload));
+      localStorage.setItem("solidocto:lastResponse", JSON.stringify(payload));
       els.rawOutput.textContent = JSON.stringify(payload, null, 2);
 
       // Remove highlight from all
@@ -608,9 +1009,12 @@
       document.getElementById("otherCard").style.boxShadow = "none";
 
       if (payload.error) {
+        state.spellingRanges = [];
+        renderTextHighlights();
         els.aiScore.textContent = "-";
         els.humanScore.textContent = "-";
         els.garbageScore.textContent = "-";
+        renderDonut(0, 0, 0);
         els.novelty.textContent = `Error: ${payload.error}`;
         els.novelty.className = "status status-error";
         return;
@@ -619,6 +1023,8 @@
       const ai = typeof payload.ai_count === "number" ? payload.ai_count : 0;
       const human = typeof payload.human_score === "number" ? payload.human_score : 0;
       const other = typeof payload.garbage_score === "number" ? payload.garbage_score : 0;
+      state.spellingRanges = Array.isArray(payload.spelling_debug) ? payload.spelling_debug : [];
+      renderTextHighlights();
 
       els.aiScore.textContent = clampScore(ai);
       els.humanScore.textContent = clampScore(human);
@@ -632,7 +1038,7 @@
         } else if (human === max) {
           document.getElementById("humanCard").style.boxShadow = "0 0 0 2px var(--good)";
         } else {
-          document.getElementById("otherCard").style.boxShadow = "0 0 0 2px var(--bad)";
+          document.getElementById("otherCard").style.boxShadow = "0 0 0 2px var(--other)";
         }
       }
 
@@ -652,6 +1058,7 @@
       els.simhashLine.textContent = `Simhash: ${payload.simhash || "-"}`;
       els.skipLine.textContent = `Skip reason: ${payload.skip_reason || "-"}`;
 
+      renderDonut(ai, human, other);
       renderScoreBreakdown(payload);
     }
 
@@ -734,21 +1141,32 @@
       };
 
       try {
+        if (state.progressTimer !== null) {
+          clearTimeout(state.progressTimer);
+          state.progressTimer = null;
+        }
+        state.progressQueue.length = 0;
+        state.pendingResponse = null;
+        state.pendingText = els.textInput.value;
         state.ws.send(JSON.stringify(payload));
         setAnalysing(true);
         setStatus("Analysing...", "warn");
       } catch (_err) {
+        state.pendingText = null;
         setStatus("Failed to send request", "error");
       }
     }
 
     function clearForm() {
+      state.pendingText = null;
+      state.spellingRanges = [];
+      localStorage.removeItem("solidocto:inputText");
       els.textInput.value = "";
       els.hpWebsite.value = "";
       els.hpCompany.value = "";
       els.shortSampleWarning.style.display = "none";
       state.lastResponse = null;
-      sessionStorage.removeItem("solidocto:lastResponse");
+      localStorage.removeItem("solidocto:lastResponse");
       updateCounter();
       els.aiScore.textContent = "-";
       els.humanScore.textContent = "-";
@@ -762,27 +1180,54 @@
         <div class="hint">Waiting for a result.</div>
       `;
       els.rawOutput.textContent = "{}";
+      renderDonut(0, 0, 0);
+      renderTextHighlights();
     }
 
     els.textInput.addEventListener("input", () => {
+      state.spellingRanges = [];
+      localStorage.setItem("solidocto:inputText", els.textInput.value);
       updateCounter();
       updateShortSampleWarning(els.textInput.value);
     });
+    els.textInput.addEventListener("scroll", syncHighlightScroll);
+
+    if (typeof ResizeObserver !== "undefined") {
+      const textObserver = new ResizeObserver(() => {
+        syncHighlightGeometry();
+        renderTextHighlights();
+      });
+      textObserver.observe(els.textInput);
+    } else {
+      window.addEventListener("resize", () => {
+        syncHighlightGeometry();
+        renderTextHighlights();
+      });
+    }
     els.connectBtn.addEventListener("click", connectSocket);
     els.analyzeBtn.addEventListener("click", analyseText);
     els.clearBtn.addEventListener("click", clearForm);
 
+    const _savedInput = localStorage.getItem("solidocto:inputText");
+    if (_savedInput) {
+      els.textInput.value = _savedInput;
+    }
+    syncHighlightGeometry();
     updateCounter();
     updateShortSampleWarning(els.textInput.value);
+    connectSocket();
 
-    const savedResponse = sessionStorage.getItem("solidocto:lastResponse");
+    const savedResponse = localStorage.getItem("solidocto:lastResponse");
     if (savedResponse) {
       try {
         const parsed = JSON.parse(savedResponse);
         renderResponse(parsed);
       } catch (_err) {
-        sessionStorage.removeItem("solidocto:lastResponse");
+        localStorage.removeItem("solidocto:lastResponse");
+        renderDonut(0, 0, 0);
       }
+    } else {
+      renderDonut(0, 0, 0);
     }
   </script>
 </body>

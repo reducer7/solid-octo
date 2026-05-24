@@ -1,0 +1,141 @@
+ai_detector:
+  key_markers:
+    em_dash_max: 3              # +1 AI per em dash (U+2014 —), max +3
+    colon_max: 2                # +1 AI per colon (:), max +2
+    aside_max: 2                # +1 AI per parenthetical aside (...), max +2
+    en_dash_max: 2              # +1 AI per en dash (U+2013 –), max +2
+    typo_double_quote_max: 3    # +1 AI per matching typographer double-quote pair ("..."), max +3
+    single_curly_max: 2         # +1 AI per single curly/typographer quote use, max +2
+
+  grammar:
+    nested_quote_add: 2         # +2 AI per correctly nested quote ("a 'b' c"), max +4
+    nested_quote_max: 4
+    plural_possessive_add: 1    # +1 AI per correct plural possessive (customers'), max +2
+    plural_possessive_max: 2
+
+  constructed_sentences:
+    add_ai: 1
+    max_add: 3
+    patterns:
+      - '(?i)\bin summary,?\b'
+      - '(?i)\boverall,?\b'
+      - '(?i)\bultimately,?\b'
+      - '(?i)\bin other words,?\b'
+      - '(?i)\bthat said,?\b'
+      - '(?i)\bto be clear,?\b'
+      - '(?i)\bfor example,?\b'
+
+  perfect_parallelism:
+    add_ai: 1
+    max_add: 3
+
+  balance_hedges:
+    add_ai: 1
+    max_add: 2
+    patterns:
+      - '(?i)\bon the other hand\b'
+      - '(?i)\bon the one hand\b'
+      - '(?i)\bwhile\b[^.?!]{0,120}\bis true\b[^.?!]{0,120}\balso important\b'
+      - '(?i)\bit''?s worth noting that\b'
+
+  over_explanation:
+    add_ai: 2
+    max_add: 10
+    min_sentence_words: 8
+    max_sentence_words: 32
+    common_terms:
+      - internet
+      - email
+      - password
+      - smartphone
+      - wifi
+      - browser
+      - social media
+      - app
+      - website
+      - update
+      - algorithm
+      - ai
+      - machine learning
+      - cloud
+    domain_guard_terms:
+      - theorem
+      - pharmacokinetics
+      - enzyme
+      - compiler
+      - finite element
+      - covariance
+      - transformer architecture
+      - immunotherapy
+      - spectroscopy
+    strong_patterns:
+      - '(?i)\b[a-z][a-z0-9\- ]{1,30}\b\s+(?:means|is defined as|refers to)\s+'
+    weak_patterns:
+      - '(?i)\bin other words\b'
+      - '(?i)\bthat means\b'
+      - '(?i)\bthis means\b'
+      - '(?i)\bput simply\b'
+      - '(?i)\bwhich is to say\b'
+
+  no_personal_experience:
+    add_ai: 2
+    max_add: 5
+    min_total_words: 60
+    min_sentences: 3
+    min_impersonal_hits: 2
+    max_first_person: 0
+    memory_patterns:
+      - '(?i)\bwhen i was\b'
+      - '(?i)\byesterday\b'
+      - '(?i)\blast (night|week|month|year)\b'
+      - '(?i)\bin \d{4}\b'
+      - '(?i)\bat (the )?[a-z][a-z\- ]{2,30}\b'
+    sensory_patterns:
+      - '(?i)\bi (saw|heard|felt|smelled|tasted|touched)\b'
+      - '(?i)\bthe smell of\b'
+      - '(?i)\bthe sound of\b'
+      - '(?i)\bit felt like\b'
+    metaphor_patterns:
+      - '(?i)\blike a [a-z][a-z\- ]{1,30}\b'
+      - '(?i)\bas if\b'
+      - '(?i)\bas though\b'
+    impersonal_patterns:
+      - '(?i)\bin general\b'
+      - '(?i)\bpeople\b'
+      - '(?i)\busers\b'
+      - '(?i)\bindividuals\b'
+      - '(?i)\bone should\b'
+      - '(?i)\bit is important to\b'
+      - '(?i)\bit is useful to\b'
+
+  ai_connectors:
+    add_ai: 1
+    max_add: 5
+    patterns:
+      - '(?i)\bnotably\b'
+      - '(?i)\bcrucially\b'
+      - '(?i)\bsignificantly\b'
+      - '(?i)\bfundamentally\b'
+      - '(?i)\bmore broadly\b'
+      - '(?i)\bin essence\b'
+      - '(?i)\bin practice\b'
+      - '(?i)\bin many ways\b'
+
+  overused_intensifiers:
+    add_ai: 1
+    max_add: 5
+    patterns:
+      - '(?i)\bhighly\b'
+      - '(?i)\bdeeply\b'
+      - '(?i)\bstrongly\b'
+      - '(?i)\bremarkably\b'
+      - '(?i)\bincredibly\b'
+
+  list_introductions:
+    add_ai: 1
+    max_add: 5
+    patterns:
+      - '(?i)\bhere are some key points\b'
+      - '(?i)\bthe following are\b'
+      - '(?i)\blet''?s break this down\b'
+      - '(?i)\bconsider the following\b'

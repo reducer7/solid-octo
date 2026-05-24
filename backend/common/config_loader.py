@@ -30,12 +30,16 @@ def load_engine_config(project_root: Path) -> dict[str, Any]:
     construction_cfg = _load_yaml(
         project_root / "backend" / "tests" / "construction" / "construction.yaml"
     )
+    ai_cfg = _load_yaml(project_root / "backend" / "tests" / "ai" / "ai_tests.yaml")
+    human_cfg = _load_yaml(project_root / "backend" / "tests" / "human" / "human_tests.yaml")
     report_cfg = _load_yaml(project_root / "backend" / "reporter" / "report.yaml")
 
     _validate_root(root_cfg)
     _validate_similarity(similar_cfg)
     _validate_garbage(garbage_cfg)
     _validate_construction(construction_cfg)
+    _validate_ai_detector(ai_cfg)
+    _validate_human_detector(human_cfg)
     _validate_report(report_cfg)
 
     return {
@@ -43,6 +47,8 @@ def load_engine_config(project_root: Path) -> dict[str, Any]:
         "similarity": similar_cfg["similarity"],
         "garbage": garbage_cfg["garbage"],
         "construction": construction_cfg["construction"],
+        "ai_detector": ai_cfg["ai_detector"],
+        "human_detector": human_cfg["human_detector"],
         "report": report_cfg["report"],
     }
 
@@ -61,6 +67,7 @@ def _validate_root(cfg: dict[str, Any]) -> None:
     app = _require(cfg, "app", "config.yaml")
     redis = _require(cfg, "redis", "config.yaml")
     fuzz = _require(cfg, "fuzz", "config.yaml")
+    ui = _require(cfg, "ui", "config.yaml")
 
     for key in ("max_text_length", "simhash_bits", "scoring_max", "schema_version", "require_captcha"):
         _require(app, key, "config.yaml.app")
@@ -70,6 +77,8 @@ def _validate_root(cfg: dict[str, Any]) -> None:
 
     for key in ("enabled", "max_jitter", "bucket_hours"):
         _require(fuzz, key, "config.yaml.fuzz")
+
+    _require(ui, "progress_display_ms", "config.yaml.ui")
 
 
 def _validate_similarity(cfg: dict[str, Any]) -> None:
@@ -96,6 +105,29 @@ def _validate_construction(cfg: dict[str, Any]) -> None:
         "marker_spiral",
     ):
         _require(construction, key, "construction.yaml.construction")
+
+
+def _validate_ai_detector(cfg: dict[str, Any]) -> None:
+    ai = _require(cfg, "ai_detector", "ai_tests.yaml")
+    for key in (
+        "key_markers",
+        "grammar",
+        "constructed_sentences",
+        "perfect_parallelism",
+        "balance_hedges",
+        "over_explanation",
+        "no_personal_experience",
+        "ai_connectors",
+        "overused_intensifiers",
+        "list_introductions",
+    ):
+        _require(ai, key, "ai_tests.yaml.ai_detector")
+
+
+def _validate_human_detector(cfg: dict[str, Any]) -> None:
+    human = _require(cfg, "human_detector", "human_tests.yaml")
+    for key in ("key_markers", "grammar", "micro_hesitation", "rhythm", "spelling"):
+        _require(human, key, "human_tests.yaml.human_detector")
 
 
 def _validate_report(cfg: dict[str, Any]) -> None:

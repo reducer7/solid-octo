@@ -191,6 +191,11 @@ def run_garbage_pass(
     # Test 7: character-bigram KL divergence
     bigram_path = resolve_from_project(project_root, str(bigram_cfg["bigram_path"]))
     reference_bigrams = _load_bigrams(bigram_path)
+    _letters = [ch for ch in ctx.text.upper() if ch.isalpha()]
+    min_letters = int(bigram_cfg.get("min_letters", 0))
+    if len(_letters) < min_letters:
+        ctx.score.clamp(max_score)
+        return
     kl = _bigram_kl_divergence(ctx.text, reference_bigrams)
 
     if kl > float(bigram_cfg["terminal_gt"]):
@@ -365,6 +370,10 @@ def _unicode_ratios(text: str) -> dict[str, float]:
             counts["punctuation"] += 1
         elif head == "S":
             counts["symbol"] += 1
+        elif head == "Z" or category in ("Cc", "Cf"):
+            # Separators (spaces, newlines) and control/format chars are normal
+            # text structure; control chars are already caught by non_printable_ratio.
+            pass
         else:
             counts["other"] += 1
 

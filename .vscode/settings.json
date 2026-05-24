@@ -1,0 +1,18 @@
+{
+    "cSpell.words": [
+        "Solidocto"
+    ],
+    "liveServer.settings.ignoreFiles": [
+        "backend/**",
+        "testing/**",
+        "*.py",
+        "*.yaml",
+        "*.json",
+        "*.jsonl",
+        "*.txt",
+        "*.md",
+        ".venv/**",
+        ".vscode/**",
+        "*.ps1"
+    ]
+}

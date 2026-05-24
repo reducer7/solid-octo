@@ -12,6 +12,7 @@ def generate_response(
     report_cfg: dict[str, Any],
     fuzz_cfg: dict[str, Any],
     max_score: int,
+    include_spelling_debug: bool = False,
 ) -> dict[str, Any]:
     ai = ctx.score.ai_score
     human = ctx.score.human_score
@@ -41,6 +42,8 @@ def generate_response(
         payload["reused_result"] = ctx.reused_result
     if ctx.skip_reason:
         payload["skip_reason"] = ctx.skip_reason
+    if include_spelling_debug:
+        payload["spelling_debug"] = ctx.spelling_debug
 
     return payload
 

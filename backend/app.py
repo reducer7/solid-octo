@@ -46,6 +46,19 @@ async def websocket_handler(websocket: Any, store: ScoreStore | None = None) -> 
     local_store = store or _build_store(config["root"])
     loop = asyncio.get_running_loop()
 
+    # Send UI config to the client once on connect.
+    ui_cfg = config["root"].get("ui", {})
+    app_cfg = config["root"].get("app", {})
+    try:
+        await websocket.send(json.dumps({
+            "type": "config",
+            "progressDisplayMs": int(ui_cfg.get("progress_display_ms", 150)),
+            "maxTextLength": int(app_cfg.get("max_text_length", 1023)),
+            "highlightSpelling": bool(app_cfg.get("highlight_spelling", False)),
+        }))
+    except websockets.exceptions.ConnectionClosed:
+        return
+
     async for raw_message in websocket:
         progress_queue: asyncio.Queue[str] = asyncio.Queue()
 

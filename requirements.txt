@@ -5,3 +5,4 @@ sentence-transformers>=2.7
 spacy>=3.7
 scikit-learn>=1.4
 numpy>=1.26
+pyspellchecker>=0.8

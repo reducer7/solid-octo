@@ -1,0 +1,128 @@
+human_detector:
+
+  # ---- test 1: key markers --------------------------------------------------
+  key_markers:
+    single_hyphen_max: 2          # +1 human per standalone hyphen (not part of --)
+    double_hyphen_max: 2          # +1 human per double-hyphen (--)
+    straight_quote_max: 2         # +1 human per ASCII double-quote (U+0022)
+    triple_dot_max: 2             # +1 human per triple-dot (...)
+    double_dot_add: 2             # +2 human per double-dot (..) occurrence
+    double_dot_max: 4             # cap for double-dot contributions
+    semicolon_max: 2              # +1 human per semicolon (;)
+    unclosed_bracket_max: 2       # +1 human per unmatched paren or unclosed straight quote
+
+  # ---- test 2: grammar ------------------------------------------------------
+  grammar:
+    possessive_error_max: 3
+    homophone_error_max: 3
+    capitalization_max: 3
+    spacing_max: 3
+    repeated_word_max: 3
+    a_an_error_max: 3
+    paragraph_boundary_max: 3
+    list_formatting_max: 3
+
+  # ---- test 3: micro-hesitations --------------------------------------------
+  micro_hesitation:
+    add_human: 1
+    max_add: 3
+    patterns:
+      # Original set
+      - "\\bI mean\\b"
+      - "\\bor rather\\b"
+      - "\\bwell actually\\b"
+      - "\\bno wait\\b"
+      - "\\bsort of\\b"
+      - "\\byou know\\b"
+      - "\\bnever mind\\b"
+      - "\\bforget it\\b"
+      - "\\bnevermind\\b"
+      - "\\bforget that\\b"
+      - "\\bscratch that\\b"
+
+      # Self-interruptions
+      - "\\bhold on\\b"
+      - "\\bhang on\\b"
+      - "\\bwait a sec\\b"
+      - "\\bwait,? what\\b"
+      - "\\bjust a second\\b"
+      - "\\bactually no\\b"
+      - "\\bno,? that'?s not right\\b"
+
+      # Hedging / softening
+      - "\\bkind of\\b"
+      - "\\bkinda\\b"
+      - "\\bmore or less\\b"
+      - "\\bI guess\\b"
+      - "\\bI suppose\\b"
+      - "\\bI think maybe\\b"
+      - "\\bI'?m not sure\\b"
+
+      # Cognitive stalls
+      - "\\bum+\\b"
+      - "\\buh+\\b"
+      - "\\ber+\\b"
+      - "\\bhmm+\\b"
+      - "\\buhm+\\b"
+      - "\\b… I mean\\b"
+      - "\\b… wait\\b"
+
+      # Conversational fillers
+      - "\\by'?know\\b"
+      - "\\bI dunno\\b"
+      - "\\bto be honest\\b"
+      - "\\bTBH\\b"
+      - "\\bI guess you could say\\b"
+
+      # Abandonments
+      - "\\banyway\\b"
+      - "\\bwhatever\\b"
+      - "\\bdoesn'?t matter\\b"
+      - "\\bforget it\\b"
+      - "\\bnot important\\b"
+      - "\\bwhere was I\\b"
+      - "\\bwhat was I saying\\b"
+
+      # Revisions
+      - "\\bor,? well\\b"
+      - "\\bor maybe\\b"
+      - "\\bno,? actually\\b"
+      - "\\bwell,? sort of\\b"
+      - "\\bwell,? not exactly\\b"
+
+      # Emotional micro-bursts
+      - "\\boh man\\b"
+      - "\\boh god\\b"
+      - "\\bjeez\\b"
+      - "\\bugh\\b"
+      - "\\bhuh\\b"
+
+      # Meta-cognitive markers
+      - "\\bwhat I mean is\\b"
+      - "\\bI'?m trying to say\\b"
+      - "\\bI don'?t know how to explain\\b"
+      - "\\bif that makes sense\\b"
+
+  # ---- test 4: uneven sentence rhythm ---------------------------------------
+  rhythm:
+    min_sentences: 2
+    short_threshold: 8
+    long_threshold: 20
+    max_add: 2
+
+  # ---- test 15: spelling mistakes ------------------------------------------
+  spelling:
+    add_human: 1
+    max_add: 8
+    min_token_len: 3
+    count_elongations: true
+    elongation_repeat_min: 3
+    allowed_extra_tokens:
+      - tbh
+      - wtf
+      - lol
+      - lmao
+      - gonna
+      - wanna
+      - kinda
+      - dunno

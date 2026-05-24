@@ -42,16 +42,17 @@ garbage:
     high_add_garbage: 1
   bigram:
     bigram_path: backend/tests/garbage/bigrams.json
+    min_letters: 75
     low_lt: 0.1
     low_add_ai: 1
     low_add_human: 1
-    mid1_gt: 0.2
+    mid1_gt: 1.0
     mid1_add_garbage: 1
     mid1_add_ai: 2
-    mid2_gt: 0.3
+    mid2_gt: 1.5
     mid2_add_garbage: 2
     mid2_add_ai: 3
-    high_gt: 0.6
+    high_gt: 3.0
     high_add_garbage: 10
-    terminal_gt: 1.0
+    terminal_gt: 8.0
     terminal_score: 999
