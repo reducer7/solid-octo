@@ -23,6 +23,7 @@ class PipelineContext:
     computed_simhash_hex: str
     submitted_simhash: str | None
     score: ScoreState
+    parsed_doc: Any | None = None
     score_contributions: list[dict[str, Any]] = field(default_factory=list)
     spelling_debug: list[dict[str, Any]] = field(default_factory=list)
     novel_text: bool = True

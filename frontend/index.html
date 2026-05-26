@@ -3,694 +3,1447 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Solidocto - Test Frontend</title>
+  <title>Solidocto</title>
   <style>
     :root {
-      --bg-1: #f3f7ff;
-      --bg-2: #fdf8ef;
-      --ink: #1b1a24;
-      --muted: #5a5f73;
-      --panel: rgba(255, 255, 255, 0.72);
-      --line: rgba(41, 48, 84, 0.16);
-      --accent: #1358d8;
-      --accent-2: #f06b24;
-      --good: #1f8f57;
-      --bad: #b3261e;
-      --other: #6f7488;
-      --radius: 10px;
-      --shadow: 0 8px 20px rgba(0, 25, 70, 0.10);
+      --color-bg: #f5f7fb;
+      --color-surface: #ffffff;
+      --color-border: #d7deea;
+      --color-text-primary: #18212f;
+      --color-text-secondary: #5c697d;
+      --color-accent-ai: #2f6bff;
+      --color-accent-human: #f08a24;
+      --color-accent-other: #495469;
+      --color-warning: #f08a24;
+      --color-error: #d32f2f;
+      --color-success: #4caf50;
+      --shadow-soft: 0 20px 50px rgba(24, 33, 47, 0.08);
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --page-gap: 24px;
+      --ring-progress: 0;
+      --ring-color: var(--color-border);
+    }
+
+    body[data-theme="dark"] {
+      --color-bg: #121821;
+      --color-surface: #1b2430;
+      --color-border: #344154;
+      --color-text-primary: #f3f6fb;
+      --color-text-secondary: #bac4d2;
+      --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.28);
     }
 
     * {
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
-      min-height: 100vh;
-      color: var(--ink);
-      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: Inter, Roboto, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 12% 5%, rgba(19, 88, 216, 0.10) 0%, rgba(19, 88, 216, 0) 38%),
-        radial-gradient(circle at 95% 12%, rgba(240, 107, 36, 0.10) 0%, rgba(240, 107, 36, 0) 32%),
-        linear-gradient(145deg, var(--bg-1), var(--bg-2));
+        radial-gradient(circle at top left, color-mix(in srgb, var(--color-accent-human) 16%, transparent), transparent 32%),
+        radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-ai) 14%, transparent), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 38%),
+        var(--color-bg);
+      color: var(--color-text-primary);
+      padding: 24px 12px 32px;
+      transition: background-color 220ms ease, color 220ms ease;
+    }
+
+    .app-shell {
+      width: min(720px, 100%);
+      margin: 0 auto;
       display: grid;
-      place-items: center;
-      padding: 6px;
+      gap: var(--page-gap);
     }
 
-    .shell {
-      width: min(700px, 100%);
-      background: var(--panel);
-      backdrop-filter: blur(6px);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
+    .panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 20px;
     }
 
-    .topbar {
+    .header-section {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      gap: 6px;
-      padding: 10px 14px 6px;
-      border-bottom: 1px solid var(--line);
-      background: linear-gradient(to right, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.35));
+      gap: 16px;
+      align-items: flex-start;
     }
 
-    .brand {
-      font-size: 1.1rem;
-      font-weight: 800;
-      letter-spacing: 0.2px;
+    .header-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
     }
 
-    .tag {
-      color: var(--muted);
-      font-size: 0.78rem;
-      margin-top: 1px;
+    .header-copy {
+      margin: 8px 0 0;
+      color: var(--color-text-secondary);
+      font-size: 15px;
+      max-width: 44ch;
     }
 
-    .content {
-      padding: 8px;
+    .header-tools {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .connection-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--color-text-primary);
+      background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--color-error);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-error) 18%, transparent);
+      transition: background-color 220ms ease, box-shadow 220ms ease;
+    }
+
+    .connection-pill[data-status="connected"] .status-dot {
+      background: var(--color-success);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-success) 18%, transparent);
+    }
+
+    .button-row,
+    .input-tools,
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button,
+    select {
+      font: inherit;
+    }
+
+    .button {
+      border-radius: 999px;
+      padding: 10px 14px;
+      border: 1px solid var(--color-border);
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+    }
+
+    .button:hover:not(:disabled),
+    .button:focus-visible:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .button-primary {
+      background: var(--color-accent-human);
+      border-color: var(--color-accent-human);
+      color: #ffffff;
+    }
+
+    .button-secondary {
+      background: transparent;
+      color: var(--color-text-primary);
+    }
+
+    .button-small {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .error-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--color-error);
+      color: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      animation: fade-in 220ms ease;
+    }
+
+    .error-banner.visible {
+      display: flex;
+    }
+
+    .error-banner .button {
+      border-color: rgba(255, 255, 255, 0.4);
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .input-panel {
+      display: grid;
+      gap: 16px;
+    }
+
+    .section-heading {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .section-copy {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    .field-group {
       display: grid;
       gap: 8px;
     }
 
-    .panel {
-      background: rgba(255, 255, 255, 0.82);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 8px 10px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 6px;
-      align-items: center;
-    }
-
-    .field {
-      display: grid;
-      gap: 4px;
-    }
-
-    label {
-      font-size: 0.75rem;
-      color: var(--muted);
+    .field-label {
+      font-size: 13px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    input[type="text"],
-    textarea {
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 8px;
-      padding: 6px 8px;
-      color: var(--ink);
-      font: inherit;
-      transition: border-color 150ms ease;
-    }
-
-    input[type="text"]:focus,
-    textarea:focus {
-      border-color: var(--accent);
-      outline: none;
-    }
-
-    textarea {
-      display: block;
-      width: 100%;
-      resize: both;
-      min-height: 110px;
-      max-height: 160px;
-      line-height: 1.3;
+      color: var(--color-text-secondary);
     }
 
     .text-overlay-wrap {
       position: relative;
-      width: 100%;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      overflow: hidden;
     }
 
-    .text-overlay-wrap textarea {
-      position: relative;
-      z-index: 2;
-      background: transparent;
+    .text-highlight-layer,
+    .text-input {
+      width: 100%;
+      min-height: 168px;
+      padding: 14px 16px;
+      font: inherit;
+      line-height: 1.55;
+      border: 0;
+      resize: none;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
     }
 
     .text-highlight-layer {
       position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
+      inset: 0;
       pointer-events: none;
-      overflow: hidden;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      padding: 6px 8px;
-      font: inherit;
-      line-height: 1.3;
-      white-space: pre-wrap;
-      overflow-wrap: break-word;
       color: transparent;
+      overflow: hidden;
+    }
+
+    .text-input {
+      position: relative;
+      background: transparent;
+      color: var(--color-text-primary);
+      outline: none;
+      z-index: 1;
+    }
+
+    .text-input::placeholder {
+      color: color-mix(in srgb, var(--color-text-secondary) 82%, transparent);
     }
 
     .spelling-mark {
-      background: rgba(240, 107, 36, 0.3);
-      border-radius: 3px;
-      box-shadow: inset 0 -1px 0 rgba(122, 66, 31, 0.5);
+      background: color-mix(in srgb, var(--color-warning) 32%, transparent);
+      border-radius: 4px;
       color: transparent;
+      box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--color-warning) 66%, transparent);
     }
 
-    .counter {
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-align: right;
-    }
-
-    .word-counter {
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-align: right;
-      margin-top: 2px;
-    }
-
-    .actions {
+    .counter-row {
       display: flex;
-      gap: 6px;
       justify-content: space-between;
+      gap: 12px;
       align-items: center;
-      flex-wrap: wrap;
-      margin-top: 4px;
+      font-size: 13px;
+      color: var(--color-text-secondary);
     }
 
-    .honeypot {
-      position: absolute;
-      left: -10000px;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
+    .counter-row.warning .char-counter {
+      color: #b26b00;
     }
 
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 7px 12px;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
+    .counter-row.error .char-counter {
+      color: var(--color-error);
     }
 
-    .btn-primary {
-      color: #fff;
-      background: linear-gradient(135deg, var(--accent), #0b72ff);
-      box-shadow: 0 10px 25px rgba(20, 90, 210, 0.25);
-    }
-
-    .btn-secondary {
-      color: var(--ink);
-      background: #fff;
-      border: 1px solid var(--line);
-    }
-
-    .hint {
-      color: var(--muted);
-      font-size: 0.7rem;
-    }
-
-    .hint-warning {
-      color: #7a421f;
-      background: rgba(240, 107, 36, 0.12);
-      border: 1px solid rgba(240, 107, 36, 0.22);
-      border-radius: 6px;
-      padding: 4px 6px;
-      font-size: 0.7rem;
+    .inline-error {
       display: none;
+      font-size: 13px;
+      color: var(--color-error);
     }
 
-    .results {
+    .inline-error.visible {
+      display: block;
+    }
+
+    .helper-note {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    .select-input {
+      min-width: 190px;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--color-text-primary);
+      padding: 10px 14px;
+    }
+
+    .action-buttons {
+      justify-content: space-between;
+    }
+
+    .progress-panel {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
+      gap: 12px;
     }
 
-    .score-card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 5px 6px;
-      background: #fff;
-      min-height: 52px;
-      transition: opacity 0.2s;
+    .progress-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
     }
 
-    .score-card--dimmed {
-      opacity: 0.35;
+    .progress-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+      transition: border-color 220ms ease, background-color 220ms ease;
     }
 
-    .score-title {
-      font-size: 0.66rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+    .progress-state-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-border);
+    }
+
+    .progress-item[data-state="running"] .progress-state-dot {
+      background: var(--color-accent-other);
+      animation: pulse 280ms ease-in-out infinite alternate;
+    }
+
+    .progress-item[data-state="done"] .progress-state-dot {
+      background: var(--color-success);
+    }
+
+    .progress-item[data-state="error"] .progress-state-dot {
+      background: var(--color-error);
+    }
+
+    .progress-item[data-state="running"] {
+      border-color: color-mix(in srgb, var(--color-accent-other) 70%, var(--color-border));
+      background: color-mix(in srgb, var(--color-accent-other) 12%, var(--color-surface));
+    }
+
+    .progress-item[data-state="done"] {
+      border-color: color-mix(in srgb, var(--color-success) 55%, var(--color-border));
+    }
+
+    .progress-item[data-state="error"] {
+      border-color: color-mix(in srgb, var(--color-error) 60%, var(--color-border));
+      background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface));
+    }
+
+    .progress-title {
+      font-size: 15px;
       font-weight: 700;
     }
 
-    .score-value {
-      margin-top: 3px;
-      font-size: 1.05rem;
+    .progress-status {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .indicator-section {
+      display: grid;
+      gap: 16px;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .indicator-rings {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      align-items: start;
+    }
+
+    .indicator-card {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+      padding: 16px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+    }
+
+    .indicator-card-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+    }
+
+    .indicator-ring {
+      position: relative;
+      width: 208px;
+      height: 208px;
+      display: grid;
+      place-items: center;
+    }
+
+    .indicator-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      transform: rotate(-90deg);
+    }
+
+    .ring-track {
+      fill: none;
+      stroke: color-mix(in srgb, var(--color-border) 72%, transparent);
+      transition: stroke 280ms ease;
+    }
+
+    .ring-track.outer {
+      stroke-width: 16;
+    }
+
+    .ring-track.inner {
+      stroke: color-mix(in srgb, var(--color-border) 48%, transparent);
+      stroke-width: 10;
+    }
+
+    .ring-segment {
+      fill: none;
+      stroke-linecap: butt;
+      transition: stroke-dasharray 280ms ease, stroke-dashoffset 280ms ease, stroke 280ms ease;
+    }
+
+    .ring-segment.outer {
+      stroke-width: 16;
+    }
+
+    .ring-segment.inner {
+      stroke-width: 10;
+    }
+
+    .ring-segment.ai {
+      stroke: var(--color-accent-ai);
+    }
+
+    .ring-segment.human {
+      stroke: var(--color-accent-human);
+    }
+
+    .ring-segment.other {
+      stroke: var(--color-accent-other);
+    }
+
+    .indicator-ring-shell {
+      position: absolute;
+      inset: 36px;
+      border-radius: 50%;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-border) 35%, transparent);
+    }
+
+    .indicator-core {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 6px;
+      width: 100%;
+      padding: 0 34px;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .indicator-value {
+      font-size: 38px;
       font-weight: 800;
       line-height: 1;
     }
 
-    .score-ai .score-value {
-      color: #0f5ec4;
-    }
-
-    .score-human .score-value {
-      color: var(--good);
-    }
-
-    .score-garbage .score-value {
-      color: var(--other);
-    }
-
-    .meta {
-      margin-top: 4px;
-      display: grid;
-      gap: 3px;
-      font-size: 0.75rem;
-    }
-
-    .breakdown {
-      margin-top: 2px;
-      display: grid;
-      gap: 2px;
-      color: var(--muted);
-      font-size: 0.7rem;
-    }
-
-    .breakdown-title {
+    .indicator-label {
+      font-size: 13px;
       font-weight: 700;
-      color: var(--ink);
-      text-transform: uppercase;
       letter-spacing: 0.08em;
-      font-size: 0.68rem;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
     }
 
-    .status {
-      padding: 4px 6px;
-      border-radius: 6px;
-      font-weight: 600;
+    .indicator-caption {
+      font-size: 14px;
+      color: var(--color-text-secondary);
     }
 
-    .status-ok {
-      background: rgba(31, 143, 87, 0.14);
-      color: #155838;
+    .indicator-percentages {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(var(--indicator-percentage-columns, 3), minmax(0, 1fr));
+      gap: 8px;
     }
 
-    .status-warn {
-      background: rgba(240, 107, 36, 0.17);
-      color: #7a421f;
+    .indicator-percentage {
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      padding: 8px 10px;
+      background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+      font-size: 12px;
+      color: var(--color-text-secondary);
     }
 
-    .status-error {
-      background: rgba(179, 38, 30, 0.13);
-      color: #7a1c17;
-    }
-
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      word-break: break-word;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-      padding: 5px;
-      min-height: 80px;
-      overflow: auto;
-      font-size: 0.7rem;
-      resize: vertical;
-    }
-
-    .progress-strip {
-      display: none;
+    .indicator-percentage strong {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 8px;
-      border-radius: 6px;
-      background: rgba(19, 88, 216, 0.08);
-      border: 1px solid rgba(19, 88, 216, 0.18);
-      font-size: 0.75rem;
-      color: #0c3a8a;
-      font-weight: 600;
+      font-size: 13px;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
     }
 
-    .progress-strip.visible {
-      display: flex;
-    }
-
-    .progress-spinner {
-      width: 12px;
-      height: 12px;
-      border: 2px solid rgba(19, 88, 216, 0.25);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .donut-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 6px 0 2px;
-      gap: 4px;
-    }
-
-    .donut-track {
-      fill: none;
-      stroke: rgba(41, 48, 84, 0.09);
-      stroke-width: 14;
-    }
-
-    .donut-inner-track {
-      fill: none;
-      stroke: rgba(41, 48, 84, 0.08);
-      stroke-width: 6;
-    }
-
-    .donut-seg {
-      fill: none;
-      stroke-width: 14;
-      stroke-linecap: butt;
-      transform-origin: 50% 50%;
-      transform: rotate(-90deg);
-      transition: stroke-dasharray 0.45s ease, stroke-dashoffset 0.45s ease;
-    }
-
-    .donut-inner-seg {
-      fill: none;
-      stroke-width: 6;
-      stroke-linecap: butt;
-      transform-origin: 50% 50%;
-      transform: rotate(-90deg);
-      transition: stroke-dasharray 0.45s ease, stroke-dashoffset 0.45s ease;
-    }
-
-    .donut-ai      { stroke: #1358d8; }
-    .donut-human   { stroke: #1f8f57; }
-    .donut-garbage { stroke: var(--other); }
-
-    .donut-center-main {
-      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
-      font-size: 22px;
-      font-weight: 800;
-      fill: #1b1a24;
-      text-anchor: middle;
-      dominant-baseline: central;
-    }
-
-    .donut-center-sub {
-      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
-      font-size: 9px;
-      font-weight: 700;
-      fill: #5a5f73;
-      text-anchor: middle;
-      dominant-baseline: central;
-      letter-spacing: 0.06em;
-    }
-
-    .donut-outer-tag-pill {
-      fill: var(--other);
-      opacity: 0.96;
-    }
-
-    .donut-outer-tag {
-      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
-      font-size: 7px;
-      font-weight: 700;
-      fill: #ffffff;
-      text-anchor: middle;
-      dominant-baseline: middle;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    .donut-legend {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      font-size: 0.68rem;
-      color: var(--muted);
-      font-weight: 700;
-      align-items: center;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .donut-legend-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .donut-legend-dot {
+    .indicator-dot {
       display: inline-block;
-      width: 7px;
-      height: 7px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       flex-shrink: 0;
     }
 
-    .donut-legend-dot.donut-ai      { background: #1358d8; }
-    .donut-legend-dot.donut-human   { background: #1f8f57; }
-    .donut-legend-dot.donut-garbage { background: var(--other); }
+    .indicator-dot.ai {
+      background: var(--color-accent-ai);
+    }
 
-    @media (max-width: 840px) {
-      .results {
+    .indicator-dot.human {
+      background: var(--color-accent-human);
+    }
+
+    .indicator-dot.other {
+      background: var(--color-accent-other);
+    }
+
+    .result-summary {
+      width: 100%;
+      display: none;
+      gap: 14px;
+      text-align: left;
+      padding: 18px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+      animation: fade-in 220ms ease;
+    }
+
+    .result-summary.visible {
+      display: grid;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .summary-metric {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: var(--color-surface);
+    }
+
+    .summary-metric-label {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .summary-metric-value {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .signal-list {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    .summary-explainer {
+      margin: 0;
+      font-size: 15px;
+      color: var(--color-text-secondary);
+    }
+
+    .summary-note {
+      margin: 0;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    .technical-details details {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+      overflow: hidden;
+    }
+
+    .technical-details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px 18px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .technical-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .details-grid {
+      display: grid;
+      gap: 12px;
+      padding: 0 18px 18px;
+    }
+
+    .details-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: var(--color-surface);
+    }
+
+    .details-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-secondary);
+      margin-bottom: 5px;
+    }
+
+    .details-value {
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .details-report {
+      margin: 0;
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-x: auto;
+    }
+
+    .flag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .flag-chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+    }
+
+    .footer {
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+      text-align: center;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      padding-bottom: 8px;
+    }
+
+    .footer-copy,
+    .footer-micro {
+      margin: 0;
+      max-width: 64ch;
+    }
+
+    .footer-micro {
+      font-size: 12px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-link {
+      border: 0;
+      background: transparent;
+      color: var(--color-text-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      padding: 0;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .dialog-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 20px 12px;
+      background: rgba(18, 24, 33, 0.58);
+      backdrop-filter: blur(6px);
+    }
+
+    .dialog-backdrop[hidden] {
+      display: none;
+    }
+
+    .dialog {
+      width: min(720px, 100%);
+      max-height: min(80vh, 900px);
+      overflow: auto;
+      background: var(--color-surface);
+      color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .dialog-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .dialog-title-block {
+      display: grid;
+      gap: 6px;
+    }
+
+    .dialog-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .dialog-subtitle {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+    }
+
+    .dialog-close {
+      flex-shrink: 0;
+    }
+
+    .dialog-body {
+      display: grid;
+      gap: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .dialog-body p,
+    .dialog-body ul,
+    .dialog-body h3 {
+      margin: 0;
+    }
+
+    .dialog-body h3 {
+      font-size: 15px;
+    }
+
+    .dialog-body ul {
+      padding-left: 20px;
+      display: grid;
+      gap: 6px;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      from {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent-other) 24%, transparent);
+      }
+      to {
+        transform: scale(1.12);
+        box-shadow: 0 0 0 7px color-mix(in srgb, var(--color-accent-other) 0%, transparent);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .header-section,
+      .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .header-tools,
+      .connection-status {
+        align-items: stretch;
+      }
+
+      .summary-grid {
         grid-template-columns: 1fr;
       }
 
-      .row {
+      .counter-row,
+      .input-tools {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .indicator-rings {
         grid-template-columns: 1fr;
+      }
+
+      .dialog-header {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
-  <main class="shell">
-    <header class="topbar">
+  <main class="app-shell">
+    <section class="panel header-section">
       <div>
-        <div class="brand">Solidocto</div>
-        <div class="tag">Know your text. Human or AI?</div>
+        <h1 class="header-title">Solidocto - AI vs Human</h1>
+        <p class="header-copy">Paste your text to see how it scores. If the "other" category is high, the sample is probably too short or too vague to classify reliably.</p>
       </div>
-      <div id="connectionBadge" class="status status-warn">Socket not connected</div>
-    </header>
-
-    <section class="content">
-      <div class="panel">
-        <div class="row">
-          <div class="field" style="grid-column: span 8;">
-            <label for="wsUrl">WebSocket URL</label>
-            <input id="wsUrl" type="text" value="ws://127.0.0.1:8765" spellcheck="false">
-          </div>
-          <div class="field" style="grid-column: span 4;">
-            <span class="hint" aria-hidden="true">&nbsp;</span>
-            <button id="connectBtn" class="btn-secondary" type="button">Connect Socket</button>
-          </div>
+      <div class="header-tools">
+        <div class="button-row">
+          <button id="theme-toggle" class="button button-secondary button-small" type="button" aria-label="Toggle light and dark mode">Dark mode</button>
         </div>
-      </div>
-
-      <div class="panel">
-        <div class="field">
-          <label for="textInput">Input Text</label>
-          <div class="text-overlay-wrap">
-            <div id="textHighlightLayer" class="text-highlight-layer" aria-hidden="true"></div>
-            <textarea id="textInput" maxlength="1023" placeholder="Paste up to 1023 characters... Unicode is accepted."></textarea>
+        <div class="connection-status" aria-live="polite">
+          <div id="connection-pill" class="connection-pill" data-status="disconnected">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="connection-label">Disconnected</span>
           </div>
-          <div id="charCounter" class="counter">0 / 1023</div>
-          <div id="wordCounter" class="word-counter">0 words</div>
+          <button id="reconnect-button" class="button button-secondary button-small" type="button" aria-label="Reconnect to the analysis service">Reconnect</button>
         </div>
-
-        <div class="honeypot" aria-hidden="true">
-          <label for="hpWebsite">Website</label>
-          <input id="hpWebsite" type="text" name="website" autocomplete="off" tabindex="-1">
-          <label for="hpCompany">Company</label>
-          <input id="hpCompany" type="text" name="company" autocomplete="off" tabindex="-1">
-        </div>
-
-        <div class="actions">
-          <div>
-            <div class="hint">Frontend sends: text, datetimeUTC, simhash.</div>
-            <div id="shortSampleWarning" class="hint-warning">Short samples will have inaccurate results and will trigger "other" indicators.</div>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button id="analyzeBtn" class="btn-primary" type="button">Analyze Text</button>
-            <button id="clearBtn" class="btn-secondary" type="button">Clear</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px;">Indicators</div>
-        <div class="results">
-          <article class="score-card score-ai" id="aiCard">
-            <div class="score-title">AI</div>
-            <div id="aiScore" class="score-value">-</div>
-          </article>
-          <article class="score-card score-human" id="humanCard">
-            <div class="score-title">Human</div>
-            <div id="humanScore" class="score-value">-</div>
-          </article>
-          <article class="score-card score-garbage" id="otherCard">
-            <div class="score-title">Other or undetermined</div>
-            <div id="garbageScore" class="score-value">-</div>
-          </article>
-        </div>
-
-        <div class="donut-wrap">
-          <svg id="donutChart" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Score distribution">
-            <circle id="donutOuterBase"    class="donut-seg donut-garbage" cx="60" cy="60" r="46" style="stroke-dasharray: 0 289"/>
-            <circle id="donutOuterHumanAi" class="donut-seg donut-human"   cx="60" cy="60" r="46" style="stroke-dasharray: 0 289"/>
-            <circle id="donutOuterAi"      class="donut-seg donut-ai"      cx="60" cy="60" r="46" style="stroke-dasharray: 0 289"/>
-            <circle class="donut-inner-track" cx="60" cy="60" r="31"/>
-            <circle id="donutInnerAi"    class="donut-inner-seg donut-ai"    cx="60" cy="60" r="31" style="stroke-dasharray: 0 195"/>
-            <circle id="donutInnerHuman" class="donut-inner-seg donut-human" cx="60" cy="60" r="31" style="stroke-dasharray: 0 195"/>
-            <g id="donutOuterTag" transform="translate(60 29)">
-              <rect class="donut-outer-tag-pill" x="0" y="0" rx="5" ry="5" width="44" height="11"></rect>
-              <text id="donutOuterTagText" class="donut-outer-tag" x="22" y="6">OTHER 0</text>
-            </g>
-            <text id="donutLabel" class="donut-center-main" x="60" y="56">—</text>
-            <text id="donutSub"   class="donut-center-sub"  x="60" y="71">NO RESULT</text>
-          </svg>
-          <div class="donut-legend">
-            <span class="donut-legend-item"><span class="donut-legend-dot donut-ai"></span>AI</span>
-            <span class="donut-legend-item"><span class="donut-legend-dot donut-human"></span>Human</span>
-            <span class="donut-legend-item"><span class="donut-legend-dot donut-garbage"></span>Other</span>
-          </div>
-        </div>
-
-        <div class="meta">
-          <div id="progressStrip" class="progress-strip" aria-live="polite">
-            <span class="progress-spinner" aria-hidden="true"></span>
-            <span id="progressLabel">Analysing...</span>
-          </div>
-          <div id="novelty" class="status status-warn">No result yet.</div>
-          <div id="simhashLine" class="hint">Simhash: -</div>
-          <div id="skipLine" class="hint">Skip reason: -</div>
-          <div id="scoreBreakdown" class="breakdown">
-            <div class="breakdown-title">Score contributions</div>
-            <div class="hint">Waiting for a result.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <label for="rawOutput">Raw Response JSON</label>
-        <pre id="rawOutput">{}</pre>
       </div>
     </section>
+
+    <div id="error-banner" class="error-banner" role="alert">
+      <span id="error-message">Connection lost.</span>
+      <div class="button-row">
+        <button id="ignore-error-button" class="button button-secondary button-small" type="button" aria-label="Ignore this connection error">Ignore</button>
+        <button id="retry-button" class="button button-secondary button-small" type="button" aria-label="Retry the last action">Retry</button>
+      </div>
+    </div>
+
+    <section class="panel input-panel">
+      <div>
+        <h2 class="section-heading">Sample Text</h2>
+        <p id="input-panel-copy" class="section-copy">Paste or type some sample text. Short samples are allowed, but the result is less reliable.</p>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="sample-select">Sample</label>
+        <div class="input-tools">
+          <select id="sample-select" class="select-input" aria-label="Choose a sample text">
+            <option value="">Choose a sample</option>
+            <option value="human-memory">Human anecdote</option>
+            <option value="ai-abstract">Abstract AI-like prose</option>
+            <option value="contradiction">Local contradiction sample</option>
+            <option value="temporal-drift">Temporal drift sample</option>
+          </select>
+          <button id="use-sample-button" class="button button-secondary button-small" type="button" aria-label="Insert the selected sample text">Use sample</button>
+          <button id="paste-button" class="button button-secondary button-small" type="button" aria-label="Paste text from the clipboard">Paste from clipboard</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="text-input">Text to analyze</label>
+        <div class="text-overlay-wrap">
+          <div id="text-highlight-layer" class="text-highlight-layer" aria-hidden="true"></div>
+          <textarea id="text-input" class="text-input" maxlength="1023" placeholder="Paste or type text here. Ctrl+Enter analyzes. Esc clears."></textarea>
+        </div>
+        <div id="inline-error" class="inline-error">Enter between 1 and 1023 characters.</div>
+        <div id="counter-row" class="counter-row">
+          <span class="helper-note" hidden>Short samples are allowed, but the result is less reliable.</span>
+          <div>
+            <span id="char-counter" class="char-counter">0 / 1023</span>
+            <span id="word-counter"> · 0 words</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="honeypot sr-only" aria-hidden="true">
+        <label for="hp-website">Website</label>
+        <input id="hp-website" type="text" name="website" autocomplete="off" tabindex="-1">
+        <label for="hp-company">Company</label>
+        <input id="hp-company" type="text" name="company" autocomplete="off" tabindex="-1">
+      </div>
+
+      <div class="action-buttons">
+        <div class="helper-note" hidden>Frontend sends text, UTC timestamp, and a client-side SimHash.</div>
+        <div class="button-row">
+          <button id="analyze-button" class="button button-primary" type="button" aria-label="Analyze the current text">Analyze</button>
+          <button id="clear-button" class="button button-secondary" type="button" aria-label="Clear the current text and result">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel progress-panel">
+      <div>
+        <h2 class="section-heading">Progress Panel</h2>
+        <p class="section-copy"></p>
+      </div>
+      <ol id="progress-list" class="progress-list">
+        <li class="progress-item" data-step="pass1-similarity" data-state="pending">
+          <span class="progress-state-dot" aria-hidden="true"></span>
+          <span class="progress-title">Similarity Checking</span>
+          <span class="progress-status">pending</span>
+        </li>
+        <li class="progress-item" data-step="pass2-coherence" data-state="pending">
+          <span class="progress-state-dot" aria-hidden="true"></span>
+          <span class="progress-title">Coherence Validation</span>
+          <span class="progress-status">pending</span>
+        </li>
+        <li class="progress-item" data-step="pass3-construction" data-state="pending">
+          <span class="progress-state-dot" aria-hidden="true"></span>
+          <span class="progress-title">Construction Verification</span>
+          <span class="progress-status">pending</span>
+        </li>
+        <li class="progress-item" data-step="pass4-ai" data-state="pending">
+          <span class="progress-state-dot" aria-hidden="true"></span>
+          <span class="progress-title">AI Specific Tests</span>
+          <span class="progress-status">pending</span>
+        </li>
+        <li class="progress-item" data-step="pass5-human" data-state="pending">
+          <span class="progress-state-dot" aria-hidden="true"></span>
+          <span class="progress-title">Human Specific Tests</span>
+          <span class="progress-status">pending</span>
+        </li>
+      </ol>
+    </section>
+
+    <section class="panel indicator-section">
+      <div>
+        <h2 class="section-heading">Indicators</h2>
+        <p class="section-copy">Left ring shows other vs AI vs Human distribution, right ring shows AI vs Human distribution.</p>
+      </div>
+
+      <div class="indicator-rings">
+        <section class="indicator-card" aria-labelledby="indicator-ring-1-title">
+          <h3 id="indicator-ring-1-title" class="indicator-card-title">Overall anaysis</h3>
+          <div id="indicator-ring-overall" class="indicator-ring" role="img" aria-label="No result yet">
+            <svg class="indicator-svg" viewBox="0 0 228 228" aria-hidden="true">
+              <circle class="ring-track outer" cx="114" cy="114" r="88"></circle>
+              <circle id="ring-overall-ai" class="ring-segment outer ai" cx="114" cy="114" r="88"></circle>
+              <circle id="ring-overall-human" class="ring-segment outer human" cx="114" cy="114" r="88"></circle>
+              <circle id="ring-overall-other" class="ring-segment outer other" cx="114" cy="114" r="88"></circle>
+            </svg>
+            <div class="indicator-ring-shell"></div>
+            <div class="indicator-core">
+              <div id="indicator-overall-value" class="indicator-value">0%</div>
+              <div id="indicator-overall-label" class="indicator-label">NO RESULT</div>
+              <div id="indicator-overall-caption" class="indicator-caption">Overall distribution</div>
+            </div>
+          </div>
+
+          <div class="indicator-percentages" aria-label="Overall percentages">
+            <div class="indicator-percentage">
+              <strong><span class="indicator-dot ai" aria-hidden="true"></span>AI</strong>
+              <span id="indicator-overall-ai-percent">0%</span>
+            </div>
+            <div class="indicator-percentage">
+              <strong><span class="indicator-dot human" aria-hidden="true"></span>Human</strong>
+              <span id="indicator-overall-human-percent">0%</span>
+            </div>
+            <div class="indicator-percentage">
+              <strong><span class="indicator-dot other" aria-hidden="true"></span>Other</strong>
+              <span id="indicator-overall-other-percent">0%</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="indicator-card" aria-labelledby="indicator-ring-2-title">
+          <h3 id="indicator-ring-2-title" class="indicator-card-title">AI vs Human</h3>
+          <div id="indicator-ring-human-ai" class="indicator-ring" role="img" aria-label="No result yet">
+            <svg class="indicator-svg" viewBox="0 0 228 228" aria-hidden="true">
+              <circle class="ring-track outer" cx="114" cy="114" r="88"></circle>
+              <circle id="ring-human-ai-ai" class="ring-segment outer ai" cx="114" cy="114" r="88"></circle>
+              <circle id="ring-human-ai-human" class="ring-segment outer human" cx="114" cy="114" r="88"></circle>
+            </svg>
+            <div class="indicator-ring-shell"></div>
+            <div class="indicator-core">
+              <div id="indicator-human-ai-value" class="indicator-value">0%</div>
+              <div id="indicator-human-ai-label" class="indicator-label">NO RESULT</div>
+              <div id="indicator-human-ai-caption" class="indicator-caption">AI vs Human share</div>
+            </div>
+          </div>
+
+          <div class="indicator-percentages" style="--indicator-percentage-columns: 2;" aria-label="AI versus Human percentages">
+            <div class="indicator-percentage">
+              <strong><span class="indicator-dot ai" aria-hidden="true"></span>AI</strong>
+              <span id="indicator-human-ai-ai-percent">0%</span>
+            </div>
+            <div class="indicator-percentage">
+              <strong><span class="indicator-dot human" aria-hidden="true"></span>Human</strong>
+              <span id="indicator-human-ai-human-percent">0%</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section id="result-summary-card" class="result-summary" aria-live="polite">
+        <div>
+          <h3 class="section-heading" style="margin-bottom: 4px;">Result Summary</h3>
+          <p class="summary-explainer">Largest overall classification from the latest analysis.</p>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-metric">
+            <div class="summary-metric-label">Largest overall classification</div>
+            <div id="summary-classification" class="summary-metric-value">No result</div>
+          </div>
+        </div>
+        <p id="summary-note" class="summary-note" hidden>A high outcome for other may indicate the text was either too short, non-English, or nonsense.</p>
+      </section>
+    </section>
+
+    <section class="technical-details">
+      <details id="technical-details">
+        <summary>Technical Details</summary>
+        <div class="details-grid">
+          <div class="details-card">
+            <div class="details-label">SimHash</div>
+            <div id="details-simhash" class="details-value">-</div>
+          </div>
+          <div class="details-card">
+            <div class="details-label">Token count</div>
+            <div id="details-token-count" class="details-value">0</div>
+          </div>
+          <div class="details-card">
+            <div class="details-label">Raw Other score</div>
+            <div id="details-raw-other-score" class="details-value">0</div>
+          </div>
+          <div class="details-card">
+            <div class="details-label">Raw AI score</div>
+            <div id="details-raw-ai-score" class="details-value">0</div>
+          </div>
+          <div class="details-card">
+            <div class="details-label">Raw Human score</div>
+            <div id="details-raw-human-score" class="details-value">0</div>
+          </div>
+          <div class="details-card">
+            <div class="details-label">Admin Report</div>
+            <pre id="details-admin-report" class="details-report">No report</pre>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <footer class="footer">
+      <p class="footer-copy">Ctrl+Enter analyzes the current text. Esc clears the interface.</p>
+      <p class="footer-micro">Solidocto provides experimental text analysis only. Results may be inaccurate and must not be used for legal, academic, or disciplinary decisions. No warranties.</p>
+      <div class="footer-links">
+        <button id="open-disclaimer-button" class="footer-link" type="button">Full disclaimer</button>
+        <button id="open-terms-button" class="footer-link" type="button">Terms of use</button>
+      </div>
+    </footer>
   </main>
+
+  <div id="disclaimer-dialog-backdrop" class="dialog-backdrop" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="disclaimer-dialog-title">
+      <div class="dialog-header">
+        <div class="dialog-title-block">
+          <h2 id="disclaimer-dialog-title" class="dialog-title">Solidocto Disclaimer</h2>
+          <p class="dialog-subtitle">Informational notice for all users of this experimental tool.</p>
+        </div>
+        <button id="close-disclaimer-button" class="button button-secondary button-small dialog-close" type="button" aria-label="Close disclaimer">Close</button>
+      </div>
+      <div class="dialog-body">
+        <p><strong>Solidocto is a free experimental tool designed to analyse text characteristics and estimate whether a sample resembles human- or AI-generated writing.</strong> All outputs, including classifications, indicators, scores, and explanations, are informational only.</p>
+        <p>Solidocto does not provide definitive detection, verification, authentication, or certification of authorship. Results may be incomplete, inaccurate, or unsuitable for high-stakes decisions.</p>
+        <p>By using Solidocto, you acknowledge that:</p>
+        <ul>
+          <li>analyses are generated automatically and may contain errors</li>
+          <li>short, ambiguous, or low-quality text can produce unreliable results</li>
+          <li>Solidocto should not be used for disciplinary, legal, academic, employment, or compliance decisions</li>
+          <li>no warranties or guarantees are provided regarding accuracy, reliability, or fitness for purpose</li>
+          <li>the creator(s) of Solidocto are not liable for any actions taken based on its outputs</li>
+        </ul>
+        <p>Solidocto is a research project, a tool for exploring text patterns and statistical signals, not an authorship detector.</p>
+      </div>
+    </section>
+  </div>
+
+  <div id="terms-dialog-backdrop" class="dialog-backdrop" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="terms-dialog-title">
+      <div class="dialog-header">
+        <div class="dialog-title-block">
+          <h2 id="terms-dialog-title" class="dialog-title">Solidocto - Terms of Use</h2>
+          <p class="dialog-subtitle">Last updated: 2026</p>
+        </div>
+        <button id="close-terms-button" class="button button-secondary button-small dialog-close" type="button" aria-label="Close terms of use">Close</button>
+      </div>
+      <div class="dialog-body">
+        <p>These Terms of Use ("Terms") govern your access to and use of <strong>Solidocto</strong>, a free experimental tool for analysing text characteristics and estimating whether a sample resembles human- or AI-generated writing. By using Solidocto, you agree to these Terms.</p>
+
+        <h3>1. Nature of the Service</h3>
+        <p>Solidocto is provided for informational and experimental purposes only. It does not verify authorship, detect plagiarism, or provide any definitive classification of text. All outputs may be incomplete, inaccurate, or unreliable.</p>
+        <p>You understand and agree that Solidocto is not suitable for use in:</p>
+        <ul>
+          <li>academic integrity decisions</li>
+          <li>employment or HR decisions</li>
+          <li>legal, disciplinary, or compliance processes</li>
+          <li>investigations or disputes</li>
+          <li>any situation where accuracy is critical</li>
+        </ul>
+
+        <h3>2. No Warranties</h3>
+        <p>Solidocto is provided "as is" and "as available", without warranties of any kind, express or implied. This includes, but is not limited to:</p>
+        <ul>
+          <li>accuracy</li>
+          <li>reliability</li>
+          <li>fitness for a particular purpose</li>
+          <li>availability or uptime</li>
+        </ul>
+        <p>You use Solidocto at your own risk.</p>
+
+        <h3>3. Limitation of Liability</h3>
+        <p>To the maximum extent permitted by law:</p>
+        <ul>
+          <li>The creator(s) of Solidocto are not liable for any direct, indirect, incidental, consequential, or special damages arising from your use of the tool.</li>
+          <li>You agree that no claim may be made against the creator(s) for decisions, actions, or outcomes based on Solidocto's outputs.</li>
+        </ul>
+
+        <h3>4. User Responsibilities</h3>
+        <p>By using Solidocto, you agree that:</p>
+        <ul>
+          <li>You will not rely on Solidocto for high-stakes or consequential decisions.</li>
+          <li>You will not represent Solidocto's outputs as authoritative, verified, or guaranteed.</li>
+          <li>You will not use Solidocto to harm, mislead, or defraud others.</li>
+        </ul>
+
+        <h3>5. Data Handling</h3>
+        <p>Solidocto processes text you submit for the purpose of generating analysis results. No guarantees are made regarding storage, retention, deletion, or privacy of submitted text. Do not submit sensitive, confidential, or personal information.</p>
+        <p>For information about privacy practices, refer to the platform hosting Solidocto.</p>
+
+        <h3>6. Changes to the Service</h3>
+        <p>Solidocto may be modified, suspended, or discontinued at any time without notice. These Terms may also be updated periodically. Continued use constitutes acceptance of updated Terms.</p>
+
+        <h3>7. Governing Law</h3>
+        <p>These Terms are governed by the laws applicable in the creator's jurisdiction, without regard to conflict-of-law principles.</p>
+
+        <h3>8. Acceptance</h3>
+        <p>By accessing or using Solidocto, you acknowledge that you have read, understood, and agreed to these Terms of Use.</p>
+      </div>
+    </section>
+  </div>
 
   <script>
     const DEFAULT_MAX_CHARS = 1023;
+    const DEFAULT_WS_URL = "ws://127.0.0.1:8765";
+    const SAMPLE_TEXTS = {
+      "human-memory": "I leaned over the sticky table, smelled onions near the doorway, and reached into my coat pocket for the keys. The dog scratched at the back step while I looked through the window and set the coffee on the bench.",
+      "ai-abstract": "The framework produced a transformative synthesis of identity and possibility across abstract layers, inviting conceptual reframing and emergent uncertainty throughout the system.",
+      contradiction: "I was there for the whole meeting, oh no I wasn't actually, I stayed home because the train never arrived.",
+      "temporal-drift": "I was walking to the store when you start asking why we are still standing in the rain."
+    };
+
+    const PROGRESS_STEPS = [
+      { key: "pass1-similarity", label: "Similarity Checking" },
+      { key: "pass2-coherence", label: "Coherence Text" },
+      { key: "pass3-construction", label: "Construction Verification" },
+      { key: "pass4-ai", label: "AI specific Tests" },
+      { key: "pass5-human", label: "Human specific Tests" }
+    ];
+
+    const BACKEND_PROGRESS_MAP = {
+      pass1_similarity: "pass1-similarity",
+      pass2_garbage: "pass2-coherence",
+      pass3_construction: "pass3-construction",
+      pass4_ai: "pass4-ai",
+      pass5_human: "pass5-human"
+    };
 
     const state = {
       ws: null,
-      lastResponse: null,
       reconnectTimer: null,
-      pendingText: null,
-      progressQueue: [],
-      progressTimer: null,
-      pendingResponse: null,
-      progressMinMs: 150,
+      analysisTimer: null,
+      lastResponse: null,
+      lastSubmittedText: "",
       maxChars: DEFAULT_MAX_CHARS,
       highlightSpelling: false,
       spellingRanges: [],
+      suppressConnectionBanner: false,
+      activeTheme: localStorage.getItem("solidocto:theme") || "light",
+      activeDialog: null,
+      lastFocusedElement: null
     };
 
     const els = {
-      wsUrl: document.getElementById("wsUrl"),
-      connectBtn: document.getElementById("connectBtn"),
-      connectionBadge: document.getElementById("connectionBadge"),
-      textInput: document.getElementById("textInput"),
-      textHighlightLayer: document.getElementById("textHighlightLayer"),
-      charCounter: document.getElementById("charCounter"),
-      wordCounter: document.getElementById("wordCounter"),
-      hpWebsite: document.getElementById("hpWebsite"),
-      hpCompany: document.getElementById("hpCompany"),
-      analyzeBtn: document.getElementById("analyzeBtn"),
-      clearBtn: document.getElementById("clearBtn"),
-      shortSampleWarning: document.getElementById("shortSampleWarning"),
-      aiScore: document.getElementById("aiScore"),
-      humanScore: document.getElementById("humanScore"),
-      garbageScore: document.getElementById("garbageScore"),
-      novelty: document.getElementById("novelty"),
-      simhashLine: document.getElementById("simhashLine"),
-      skipLine: document.getElementById("skipLine"),
-      scoreBreakdown: document.getElementById("scoreBreakdown"),
-      rawOutput: document.getElementById("rawOutput")
+      connectionPill: document.getElementById("connection-pill"),
+      connectionLabel: document.getElementById("connection-label"),
+      reconnectButton: document.getElementById("reconnect-button"),
+      themeToggle: document.getElementById("theme-toggle"),
+      errorBanner: document.getElementById("error-banner"),
+      errorMessage: document.getElementById("error-message"),
+      ignoreErrorButton: document.getElementById("ignore-error-button"),
+      retryButton: document.getElementById("retry-button"),
+      sampleSelect: document.getElementById("sample-select"),
+      useSampleButton: document.getElementById("use-sample-button"),
+      pasteButton: document.getElementById("paste-button"),
+      inputPanelCopy: document.getElementById("input-panel-copy"),
+      textInput: document.getElementById("text-input"),
+      textHighlightLayer: document.getElementById("text-highlight-layer"),
+      inlineError: document.getElementById("inline-error"),
+      counterRow: document.getElementById("counter-row"),
+      charCounter: document.getElementById("char-counter"),
+      wordCounter: document.getElementById("word-counter"),
+      hpWebsite: document.getElementById("hp-website"),
+      hpCompany: document.getElementById("hp-company"),
+      analyzeButton: document.getElementById("analyze-button"),
+      clearButton: document.getElementById("clear-button"),
+      progressList: document.getElementById("progress-list"),
+      indicatorRingOverall: document.getElementById("indicator-ring-overall"),
+      indicatorRingHumanAi: document.getElementById("indicator-ring-human-ai"),
+      ringOverallAi: document.getElementById("ring-overall-ai"),
+      ringOverallHuman: document.getElementById("ring-overall-human"),
+      ringOverallOther: document.getElementById("ring-overall-other"),
+      ringHumanAiAi: document.getElementById("ring-human-ai-ai"),
+      ringHumanAiHuman: document.getElementById("ring-human-ai-human"),
+      indicatorOverallValue: document.getElementById("indicator-overall-value"),
+      indicatorOverallLabel: document.getElementById("indicator-overall-label"),
+      indicatorOverallCaption: document.getElementById("indicator-overall-caption"),
+      indicatorOverallAiPercent: document.getElementById("indicator-overall-ai-percent"),
+      indicatorOverallHumanPercent: document.getElementById("indicator-overall-human-percent"),
+      indicatorOverallOtherPercent: document.getElementById("indicator-overall-other-percent"),
+      indicatorHumanAiValue: document.getElementById("indicator-human-ai-value"),
+      indicatorHumanAiLabel: document.getElementById("indicator-human-ai-label"),
+      indicatorHumanAiCaption: document.getElementById("indicator-human-ai-caption"),
+      indicatorHumanAiAiPercent: document.getElementById("indicator-human-ai-ai-percent"),
+      indicatorHumanAiHumanPercent: document.getElementById("indicator-human-ai-human-percent"),
+      resultSummaryCard: document.getElementById("result-summary-card"),
+      summaryClassification: document.getElementById("summary-classification"),
+      summaryNote: document.getElementById("summary-note"),
+      detailsSimhash: document.getElementById("details-simhash"),
+      detailsTokenCount: document.getElementById("details-token-count"),
+      detailsRawOtherScore: document.getElementById("details-raw-other-score"),
+      detailsRawAiScore: document.getElementById("details-raw-ai-score"),
+      detailsRawHumanScore: document.getElementById("details-raw-human-score"),
+      detailsAdminReport: document.getElementById("details-admin-report"),
+      openDisclaimerButton: document.getElementById("open-disclaimer-button"),
+      openTermsButton: document.getElementById("open-terms-button"),
+      disclaimerDialogBackdrop: document.getElementById("disclaimer-dialog-backdrop"),
+      termsDialogBackdrop: document.getElementById("terms-dialog-backdrop"),
+      closeDisclaimerButton: document.getElementById("close-disclaimer-button"),
+      closeTermsButton: document.getElementById("close-terms-button")
     };
 
-    function setStatus(message, kind) {
-      els.connectionBadge.textContent = message;
-      els.connectionBadge.className = `status status-${kind}`;
+    function getDialogBackdrop(dialogKey) {
+      if (dialogKey === "disclaimer") {
+        return els.disclaimerDialogBackdrop;
+      }
+      if (dialogKey === "terms") {
+        return els.termsDialogBackdrop;
+      }
+      return null;
     }
 
-    const STEP_LABELS = {
-      pass1_similarity:   "Pass 1: Checking for similar submissions...",
-      pass2_garbage:      "Pass 2: Running garbage detection...",
-      pass3_construction: "Pass 3: Running construction analysis...",
-    };
-
-    function showProgress(step) {
-      const label = STEP_LABELS[step] || `Running ${step}...`;
-      document.getElementById("progressLabel").textContent = label;
-      document.getElementById("progressStrip").classList.add("visible");
+    function getDialogCloseButton(dialogKey) {
+      if (dialogKey === "disclaimer") {
+        return els.closeDisclaimerButton;
+      }
+      if (dialogKey === "terms") {
+        return els.closeTermsButton;
+      }
+      return null;
     }
 
-    function clearProgress() {
-      document.getElementById("progressStrip").classList.remove("visible");
+    function openDialog(dialogKey) {
+      const backdrop = getDialogBackdrop(dialogKey);
+      if (!backdrop) {
+        return;
+      }
+
+      if (state.activeDialog && state.activeDialog !== dialogKey) {
+        closeDialog(state.activeDialog, false);
+      }
+
+      state.lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      state.activeDialog = dialogKey;
+      backdrop.hidden = false;
+      document.body.classList.add("modal-open");
+      getDialogCloseButton(dialogKey)?.focus();
     }
 
-    // Drain the progress queue at 150 ms per step, then render the response.
-    function _flushProgress() {
-      state.progressTimer = null;
-      if (state.progressQueue.length > 0) {
-        showProgress(state.progressQueue.shift());
-        state.progressTimer = setTimeout(_flushProgress, state.progressMinMs);
-      } else if (state.pendingResponse !== null) {
-        const response = state.pendingResponse;
-        state.pendingResponse = null;
-        setAnalysing(false);
-        const restoreText = state.pendingText ?? localStorage.getItem("solidocto:inputText");
-        if (restoreText !== null && els.textInput.value === "") {
-          els.textInput.value = restoreText;
-          updateCounter();
+    function closeDialog(dialogKey = state.activeDialog, restoreFocus = true) {
+      const backdrop = getDialogBackdrop(dialogKey);
+      if (!backdrop) {
+        return;
+      }
+
+      backdrop.hidden = true;
+      if (state.activeDialog === dialogKey) {
+        state.activeDialog = null;
+      }
+      if (!state.activeDialog) {
+        document.body.classList.remove("modal-open");
+        if (restoreFocus) {
+          state.lastFocusedElement?.focus();
         }
-        state.pendingText = null;
-        renderResponse(response);
+        state.lastFocusedElement = null;
       }
     }
 
-    function setAnalysing(active) {
-      els.analyzeBtn.disabled = active;
-      els.analyzeBtn.textContent = active ? "Analysing…" : "Analyse Text";
-      ["aiCard", "humanCard", "otherCard"].forEach(id =>
-        document.getElementById(id).classList.toggle("score-card--dimmed", active)
-      );
-      if (!active) {
-        clearProgress();
-        if (state.ws && state.ws.readyState === WebSocket.OPEN) {
-          setStatus("Socket connected", "ok");
-        }
+    function applyTheme(theme) {
+      state.activeTheme = theme === "dark" ? "dark" : "light";
+      document.body.dataset.theme = state.activeTheme;
+      els.themeToggle.textContent = state.activeTheme === "dark" ? "Light mode" : "Dark mode";
+      localStorage.setItem("solidocto:theme", state.activeTheme);
+    }
+
+    function setConnectionStatus(status) {
+      const normalized = status === "connected" ? "connected" : "disconnected";
+      els.connectionPill.dataset.status = normalized;
+      els.connectionLabel.textContent = normalized === "connected" ? "Connected" : "Disconnected";
+    }
+
+    function showError(message) {
+      els.errorMessage.textContent = message;
+      els.errorBanner.classList.add("visible");
+    }
+
+    function clearError() {
+      els.errorBanner.classList.remove("visible");
+      els.errorMessage.textContent = "";
+    }
+
+    function showConnectionError(message) {
+      if (state.suppressConnectionBanner) {
+        return;
+      }
+      showError(message);
+    }
+
+    function ignoreConnectionError() {
+      state.suppressConnectionBanner = true;
+      clearError();
+    }
+
+    function setInlineError(message) {
+      if (message) {
+        els.inlineError.textContent = message;
+        els.inlineError.classList.add("visible");
+      } else {
+        els.inlineError.textContent = "";
+        els.inlineError.classList.remove("visible");
+      }
+    }
+
+    function countWords(text) {
+      const matches = text.trim().match(/[\p{L}\p{N}']+/gu);
+      return matches ? matches.length : 0;
+    }
+
+    function autoExpandTextarea() {
+      els.textInput.style.height = "auto";
+      els.textInput.style.height = `${Math.min(els.textInput.scrollHeight, 360)}px`;
+      syncHighlightGeometry();
+      renderTextHighlights();
+    }
+
+    function refreshInputLimitCopy() {
+      els.inputPanelCopy.textContent = `Paste, sample, or type up to ${state.maxChars} characters. Short samples are allowed, but the result is less reliable under 200 characters.`;
+      els.textInput.placeholder = `Paste or type text here (max ${state.maxChars} characters). Ctrl+Enter analyzes. Esc clears.`;
+      if (!els.inlineError.classList.contains("visible")) {
+        els.inlineError.textContent = `Enter between 1 and ${state.maxChars} characters.`;
       }
     }
 
@@ -699,28 +1452,44 @@
       if (value !== els.textInput.value) {
         els.textInput.value = value;
       }
-      els.charCounter.textContent = `${value.length} / ${state.maxChars}`;
-      els.wordCounter.textContent = `${countWords(value)} word${countWords(value) === 1 ? "" : "s"}`;
-      renderTextHighlights();
+
+      const charCount = value.length;
+      const wordCount = countWords(value);
+      els.charCounter.textContent = `${charCount} / ${state.maxChars}`;
+      els.wordCounter.textContent = ` · ${wordCount} word${wordCount === 1 ? "" : "s"}`;
+      els.counterRow.classList.remove("warning", "error");
+      if (charCount > 0 && charCount < 100) {
+        els.counterRow.classList.add("error");
+      } else if (charCount > 0 && charCount < 200) {
+        els.counterRow.classList.add("warning");
+      }
+
+      localStorage.setItem("solidocto:input-text", value);
+      autoExpandTextarea();
     }
 
-    function applyUiConfig(configPayload) {
-      if (typeof configPayload.maxTextLength === "number" && Number.isFinite(configPayload.maxTextLength)) {
-        const nextMax = Math.max(1, Math.floor(configPayload.maxTextLength));
-        state.maxChars = nextMax;
-        els.textInput.maxLength = nextMax;
-        els.textInput.placeholder = `Paste up to ${nextMax} characters... Unicode is accepted.`;
+    function validateInput() {
+      const text = els.textInput.value.trim();
+      if (!text) {
+        setInlineError("Input is required.");
+        return false;
       }
-      if (typeof configPayload.progressDisplayMs === "number") {
-        state.progressMinMs = configPayload.progressDisplayMs;
+      if (text.length > state.maxChars) {
+        setInlineError(`Input must be ${state.maxChars} characters or fewer.`);
+        return false;
       }
-      if (typeof configPayload.highlightSpelling === "boolean") {
-        state.highlightSpelling = configPayload.highlightSpelling;
-        if (!state.highlightSpelling) {
-          state.spellingRanges = [];
-        }
-      }
-      updateCounter();
+      setInlineError("");
+      return true;
+    }
+
+    function syncHighlightGeometry() {
+      els.textHighlightLayer.style.width = `${els.textInput.clientWidth}px`;
+      els.textHighlightLayer.style.height = `${els.textInput.clientHeight}px`;
+    }
+
+    function syncHighlightScroll() {
+      els.textHighlightLayer.scrollTop = els.textInput.scrollTop;
+      els.textHighlightLayer.scrollLeft = els.textInput.scrollLeft;
     }
 
     function normalizeSpellingRanges(ranges, maxLen) {
@@ -741,7 +1510,7 @@
         cleaned.push({ start, end });
       }
 
-      cleaned.sort((a, b) => (a.start - b.start) || (a.end - b.end));
+      cleaned.sort((left, right) => (left.start - right.start) || (left.end - right.end));
       const merged = [];
       for (const current of cleaned) {
         const last = merged[merged.length - 1];
@@ -754,26 +1523,12 @@
       return merged;
     }
 
-    function syncHighlightScroll() {
-      els.textHighlightLayer.scrollTop = els.textInput.scrollTop;
-      els.textHighlightLayer.scrollLeft = els.textInput.scrollLeft;
-    }
-
-    function syncHighlightGeometry() {
-      // Match the textarea's visible content box so wraps align with scrollbar/resizing.
-      els.textHighlightLayer.style.width = `${els.textInput.clientWidth}px`;
-      els.textHighlightLayer.style.height = `${els.textInput.clientHeight}px`;
-    }
-
     function renderTextHighlights() {
       const text = els.textInput.value;
-      const ranges = state.highlightSpelling
-        ? normalizeSpellingRanges(state.spellingRanges, text.length)
-        : [];
+      const ranges = state.highlightSpelling ? normalizeSpellingRanges(state.spellingRanges, text.length) : [];
 
       if (!text) {
         els.textHighlightLayer.innerHTML = "";
-        syncHighlightScroll();
         return;
       }
 
@@ -783,323 +1538,21 @@
         return;
       }
 
-      const html = [];
+      const parts = [];
       let cursor = 0;
       for (const range of ranges) {
         if (range.start > cursor) {
-          html.push(escapeHtml(text.slice(cursor, range.start)));
+          parts.push(escapeHtml(text.slice(cursor, range.start)));
         }
-        html.push(`<mark class="spelling-mark">${escapeHtml(text.slice(range.start, range.end))}</mark>`);
+        parts.push(`<mark class="spelling-mark">${escapeHtml(text.slice(range.start, range.end))}</mark>`);
         cursor = range.end;
       }
       if (cursor < text.length) {
-        html.push(escapeHtml(text.slice(cursor)));
+        parts.push(escapeHtml(text.slice(cursor)));
       }
-      html.push("\n");
-      els.textHighlightLayer.innerHTML = html.join("");
+      parts.push("\n");
+      els.textHighlightLayer.innerHTML = parts.join("");
       syncHighlightScroll();
-    }
-
-    function clampScore(v) {
-      if (typeof v !== "number") {
-        return "-";
-      }
-      return String(Math.max(0, Math.min(999, Math.round(v))));
-    }
-
-    function countWords(text) {
-      const matches = text.trim().match(/[\p{L}\p{N}']+/gu);
-      return matches ? matches.length : 0;
-    }
-
-    function updateShortSampleWarning(text) {
-      const isShort = countWords(text) < 200;
-      els.shortSampleWarning.style.display = isShort ? "block" : "none";
-    }
-
-    // Deterministic 64-bit SimHash from token hashes using BigInt operations.
-    function computeSimhash64(text) {
-      const tokens = (text.toLowerCase().match(/[\p{L}\p{N}']+/gu) || []);
-      if (tokens.length === 0) {
-        return "0x0000000000000000";
-      }
-
-      const vector = new Array(64).fill(0);
-      for (const token of tokens) {
-        const hash = fnv1a64(token);
-        for (let i = 0n; i < 64n; i++) {
-          const bit = (hash >> i) & 1n;
-          vector[Number(i)] += bit === 1n ? 1 : -1;
-        }
-      }
-
-      let result = 0n;
-      for (let i = 0n; i < 64n; i++) {
-        if (vector[Number(i)] >= 0) {
-          result |= (1n << i);
-        }
-      }
-      return `0x${result.toString(16).padStart(16, "0")}`;
-    }
-
-    // FNV-1a 64-bit hash for per-token hashing in client-side simhash generation.
-    function fnv1a64(input) {
-      let hash = 0xcbf29ce484222325n;
-      const prime = 0x100000001b3n;
-      const encoder = new TextEncoder();
-      const bytes = encoder.encode(input);
-      for (const byte of bytes) {
-        hash ^= BigInt(byte);
-        hash = BigInt.asUintN(64, hash * prime);
-      }
-      return hash;
-    }
-
-    function connectSocket() {
-      const url = els.wsUrl.value.trim();
-      if (!url) {
-        setStatus("Socket URL is required", "error");
-        return;
-      }
-
-      if (state.reconnectTimer) {
-        clearTimeout(state.reconnectTimer);
-        state.reconnectTimer = null;
-      }
-
-      if (state.ws && state.ws.readyState <= 1) {
-        state.ws.close();
-      }
-
-      setStatus("Connecting...", "warn");
-      const ws = new WebSocket(url);
-      state.ws = ws;
-
-      ws.onopen = () => setStatus("Socket connected", "ok");
-      ws.onerror = () => setStatus("Socket error", "error");
-      ws.onclose = () => {
-        if (state.ws !== ws) {
-          return;
-        }
-
-        setStatus("Socket disconnected", "warn");
-        state.reconnectTimer = setTimeout(() => {
-          if (state.ws === ws) {
-            connectSocket();
-          }
-        }, 500);
-      };
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.type === "progress") {
-            state.progressQueue.push(data.step);
-            if (state.progressTimer === null) {
-              _flushProgress();
-            }
-          } else if (data.type === "config") {
-            applyUiConfig(data);
-          } else {
-            state.pendingResponse = data;
-            if (state.progressTimer === null) {
-              _flushProgress();
-            }
-          }
-        } catch (_err) {
-          clearTimeout(state.progressTimer);
-          state.progressTimer = null;
-          state.progressQueue.length = 0;
-          state.pendingResponse = null;
-          setAnalysing(false);
-          state.pendingText = null;
-          els.rawOutput.textContent = String(event.data);
-          setStatus("Received non-JSON response", "error");
-        }
-      };
-    }
-
-    function renderDonut(ai, human, garbage) {
-      const R = 46;
-      const C = 2 * Math.PI * R;
-      const INNER_R = 31;
-      const INNER_C = 2 * Math.PI * INNER_R;
-      const total = ai + human + garbage;
-      const elLabel = document.getElementById("donutLabel");
-      const elSub   = document.getElementById("donutSub");
-      const elOuterTagText = document.getElementById("donutOuterTagText");
-
-      if (total === 0) {
-        [["donutOuterBase", 0], ["donutOuterHumanAi", 0], ["donutOuterAi", 0]].forEach(([id]) => {
-          const el = document.getElementById(id);
-          el.style.strokeDasharray = `0 ${C}`;
-          el.style.strokeDashoffset = "0";
-        });
-        [["donutInnerAi", 0], ["donutInnerHuman", 0]].forEach(([id]) => {
-          const el = document.getElementById(id);
-          el.style.strokeDasharray = `0 ${INNER_C}`;
-          el.style.strokeDashoffset = "0";
-        });
-        elLabel.textContent = "\u2014";
-        elSub.textContent = "NO RESULT";
-        elOuterTagText.textContent = "OTHER 0";
-        return;
-      }
-
-      elOuterTagText.textContent = `OTHER ${garbage}`;
-
-      // Outer ring (seam-free): draw stacked layers on the same arc.
-      // 1) Base = Other over full circumference
-      // 2) Human+AI overlay from top
-      // 3) AI overlay from top
-      const nonGarbage = ai + human;
-      const nonGarbageLen = (nonGarbage / total) * C;
-      const aiLenOuter = (ai / total) * C;
-
-      const elOuterBase = document.getElementById("donutOuterBase");
-      const elOuterHumanAi = document.getElementById("donutOuterHumanAi");
-      const elOuterAi = document.getElementById("donutOuterAi");
-
-      elOuterBase.style.strokeDasharray = `${C} ${C}`;
-      elOuterBase.style.strokeDashoffset = "0";
-
-      elOuterHumanAi.style.strokeDasharray = `${nonGarbageLen} ${C}`;
-      elOuterHumanAi.style.strokeDashoffset = "0";
-
-      elOuterAi.style.strokeDasharray = `${aiLenOuter} ${C}`;
-      elOuterAi.style.strokeDashoffset = "0";
-
-      const aiHumanTotal = ai + human;
-      if (aiHumanTotal > 0) {
-        const aiLen = (ai / aiHumanTotal) * INNER_C;
-        const humanLen = (human / aiHumanTotal) * INNER_C;
-        const elInnerAi = document.getElementById("donutInnerAi");
-        const elInnerHuman = document.getElementById("donutInnerHuman");
-
-        // Start AI at 12 o'clock and start Human immediately after AI.
-        elInnerAi.style.strokeDasharray = `${aiLen} ${INNER_C}`;
-        elInnerAi.style.strokeDashoffset = "0";
-        elInnerHuman.style.strokeDasharray = `${humanLen} ${INNER_C}`;
-        elInnerHuman.style.strokeDashoffset = String(-aiLen);
-      } else {
-        [["donutInnerAi", 0], ["donutInnerHuman", 0]].forEach(([id]) => {
-          const el = document.getElementById(id);
-          el.style.strokeDasharray = `0 ${INNER_C}`;
-          el.style.strokeDashoffset = "0";
-        });
-      }
-
-      // Center label: always show max of AI vs Human (inner-ring focus).
-      if (ai >= human) {
-        elLabel.textContent = String(ai);
-        elSub.textContent = "AI";
-      } else {
-        elLabel.textContent = String(human);
-        elSub.textContent = "HUMAN";
-      }
-    }
-
-    function renderResponse(payload) {
-      state.lastResponse = payload;
-      localStorage.setItem("solidocto:lastResponse", JSON.stringify(payload));
-      els.rawOutput.textContent = JSON.stringify(payload, null, 2);
-
-      // Remove highlight from all
-      document.getElementById("aiCard").style.boxShadow = "none";
-      document.getElementById("humanCard").style.boxShadow = "none";
-      document.getElementById("otherCard").style.boxShadow = "none";
-
-      if (payload.error) {
-        state.spellingRanges = [];
-        renderTextHighlights();
-        els.aiScore.textContent = "-";
-        els.humanScore.textContent = "-";
-        els.garbageScore.textContent = "-";
-        renderDonut(0, 0, 0);
-        els.novelty.textContent = `Error: ${payload.error}`;
-        els.novelty.className = "status status-error";
-        return;
-      }
-
-      const ai = typeof payload.ai_count === "number" ? payload.ai_count : 0;
-      const human = typeof payload.human_score === "number" ? payload.human_score : 0;
-      const other = typeof payload.garbage_score === "number" ? payload.garbage_score : 0;
-      state.spellingRanges = Array.isArray(payload.spelling_debug) ? payload.spelling_debug : [];
-      renderTextHighlights();
-
-      els.aiScore.textContent = clampScore(ai);
-      els.humanScore.textContent = clampScore(human);
-      els.garbageScore.textContent = clampScore(other);
-
-      // Highlight the highest
-      const max = Math.max(ai, human, other);
-      if (max > 0) {
-        if (ai === max) {
-          document.getElementById("aiCard").style.boxShadow = "0 0 0 2px var(--accent)";
-        } else if (human === max) {
-          document.getElementById("humanCard").style.boxShadow = "0 0 0 2px var(--good)";
-        } else {
-          document.getElementById("otherCard").style.boxShadow = "0 0 0 2px var(--other)";
-        }
-      }
-
-      const novel = payload.novel_text;
-      const reused = payload.reused_result;
-      if (novel === true) {
-        els.novelty.textContent = "Novel text: new analysis run.";
-        els.novelty.className = "status status-ok";
-      } else if (reused === true) {
-        els.novelty.textContent = "Very similar text seen before: reused prior result.";
-        els.novelty.className = "status status-warn";
-      } else {
-        els.novelty.textContent = "Result returned.";
-        els.novelty.className = "status status-warn";
-      }
-
-      els.simhashLine.textContent = `Simhash: ${payload.simhash || "-"}`;
-      els.skipLine.textContent = `Skip reason: ${payload.skip_reason || "-"}`;
-
-      renderDonut(ai, human, other);
-      renderScoreBreakdown(payload);
-    }
-
-    function renderScoreBreakdown(payload) {
-      const contributions = Array.isArray(payload.score_contributions) ? payload.score_contributions : [];
-      const totals = payload.score_totals || null;
-      const displayedTotals = {
-        ai: typeof payload.ai_count === "number" ? payload.ai_count : 0,
-        human: typeof payload.human_score === "number" ? payload.human_score : 0,
-        garbage: typeof payload.garbage_score === "number" ? payload.garbage_score : 0,
-      };
-
-      if (!contributions.length) {
-        const totalLine = totals
-          ? `Raw totals (before fuzz) - AI: ${totals.ai ?? 0}, Human: ${totals.human ?? 0}, Garbage: ${totals.garbage ?? 0}`
-          : "No contribution details available.";
-        els.scoreBreakdown.innerHTML = `
-          <div class="breakdown-title">Score contributions</div>
-          <div class="hint">Displayed totals - AI: ${escapeHtml(String(displayedTotals.ai))}, Human: ${escapeHtml(String(displayedTotals.human))}, Other: ${escapeHtml(String(displayedTotals.garbage))}</div>
-          <div class="hint">${escapeHtml(totalLine)}</div>
-        `;
-        return;
-      }
-
-      const lines = contributions.map((item) => {
-        const amount = typeof item.amount === "number" ? item.amount : 0;
-        const source = item.source || "unknown";
-        const score = item.score || "unknown";
-        return `<div class="hint">${escapeHtml(score.toUpperCase())} +${escapeHtml(String(amount))} from ${escapeHtml(source)}</div>`;
-      }).join("");
-
-      const totalLine = totals
-        ? `<div class="hint">Raw totals (before fuzz) - AI: ${escapeHtml(String(totals.ai ?? 0))}, Human: ${escapeHtml(String(totals.human ?? 0))}, Garbage: ${escapeHtml(String(totals.garbage ?? 0))}</div>`
-        : "";
-
-      els.scoreBreakdown.innerHTML = `
-        <div class="breakdown-title">Score contributions</div>
-        <div class="hint">Displayed totals - AI: ${escapeHtml(String(displayedTotals.ai))}, Human: ${escapeHtml(String(displayedTotals.human))}, Other: ${escapeHtml(String(displayedTotals.garbage))}</div>
-        ${lines}
-        ${totalLine}
-      `;
     }
 
     function escapeHtml(value) {
@@ -1111,124 +1564,524 @@
         .replaceAll("'", "&#39;");
     }
 
-    function analyseText() {
-      if (!state.ws || state.ws.readyState !== WebSocket.OPEN) {
-        setStatus("Connect socket before analysis", "error");
+    function resetProgressPanel() {
+      for (const item of els.progressList.querySelectorAll(".progress-item")) {
+        item.dataset.state = "pending";
+        item.querySelector(".progress-status").textContent = "pending";
+      }
+    }
+
+    function setProgressState(stepKey, nextState) {
+      const item = els.progressList.querySelector(`[data-step="${stepKey}"]`);
+      if (!item) {
         return;
       }
+      item.dataset.state = nextState;
+      item.querySelector(".progress-status").textContent = nextState;
+    }
 
+    function markStepSequence(stepKey) {
+      const order = PROGRESS_STEPS.map((step) => step.key);
+      const currentIndex = order.indexOf(stepKey);
+      if (currentIndex < 0) {
+        return;
+      }
+      order.forEach((key, index) => {
+        if (index < currentIndex) {
+          setProgressState(key, "done");
+        } else if (index === currentIndex) {
+          setProgressState(key, "running");
+        } else if (els.progressList.querySelector(`[data-step="${key}"]`)?.dataset.state !== "error") {
+          setProgressState(key, "pending");
+        }
+      });
+    }
+
+    function completeProgressPanel() {
+      for (const step of PROGRESS_STEPS) {
+        if (els.progressList.querySelector(`[data-step="${step.key}"]`)?.dataset.state !== "error") {
+          setProgressState(step.key, "done");
+        }
+      }
+    }
+
+    function setProgressError() {
+      const running = els.progressList.querySelector(".progress-item[data-state='running']");
+      if (running) {
+        setProgressState(running.dataset.step, "error");
+      } else {
+        setProgressState("pass5-human", "error");
+      }
+    }
+
+    function setRingSegment(element, radius, startFraction, spanFraction) {
+      const circumference = 2 * Math.PI * radius;
+      const safeSpan = Math.max(0, Math.min(1, spanFraction));
+      const arcLength = circumference * safeSpan;
+      element.style.strokeDasharray = `${arcLength} ${circumference}`;
+      element.style.strokeDashoffset = String(-circumference * startFraction);
+    }
+
+    function updateIndicator(classification, confidence, scores = {}) {
+      const label = classification || "NO RESULT";
+      const numericConfidence = Number.isFinite(confidence) ? Math.max(0, Math.min(100, Math.round(confidence))) : 0;
+      const ai = Number.isFinite(scores.ai) ? Math.max(0, scores.ai) : 0;
+      const human = Number.isFinite(scores.human) ? Math.max(0, scores.human) : 0;
+      const other = Number.isFinite(scores.other) ? Math.max(0, scores.other) : 0;
+      const outerTotal = ai + human + other;
+      const aiHumanTotal = ai + human;
+      const aiOuterFraction = outerTotal > 0 ? ai / outerTotal : 0;
+      const humanOuterFraction = outerTotal > 0 ? human / outerTotal : 0;
+      const otherOuterFraction = outerTotal > 0 ? other / outerTotal : 0;
+      const aiHumanAiFraction = aiHumanTotal > 0 ? ai / aiHumanTotal : 0;
+      const aiHumanHumanFraction = aiHumanTotal > 0 ? human / aiHumanTotal : 0;
+      const dominantOverallScore = Math.max(ai, human, other);
+      const dominantOverallLabel = dominantOverallScore > 0
+        ? (other >= ai && other >= human ? "OTHER" : ai >= human ? "AI" : "HUMAN")
+        : label;
+      const dominantOverallPercent = outerTotal > 0 ? Math.round((dominantOverallScore / outerTotal) * 100) : 0;
+      const dominantHumanAiScore = Math.max(ai, human);
+      const dominantHumanAiLabel = dominantHumanAiScore > 0 ? (ai >= human ? "AI" : "HUMAN") : "NO RESULT";
+      const dominantHumanAiPercent = aiHumanTotal > 0 ? Math.round((dominantHumanAiScore / aiHumanTotal) * 100) : 0;
+
+      setRingSegment(els.ringOverallAi, 88, 0, aiOuterFraction);
+      setRingSegment(els.ringOverallHuman, 88, aiOuterFraction, humanOuterFraction);
+      setRingSegment(els.ringOverallOther, 88, aiOuterFraction + humanOuterFraction, otherOuterFraction);
+      setRingSegment(els.ringHumanAiAi, 88, 0, aiHumanAiFraction);
+      setRingSegment(els.ringHumanAiHuman, 88, aiHumanAiFraction, aiHumanHumanFraction);
+
+      els.indicatorOverallValue.textContent = `${dominantOverallPercent}%`;
+      els.indicatorOverallLabel.textContent = dominantOverallLabel;
+      els.indicatorOverallCaption.textContent = outerTotal > 0 ? "Overall distribution" : "No overall result";
+      els.indicatorOverallAiPercent.textContent = `${Math.round(aiOuterFraction * 100)}%`;
+      els.indicatorOverallHumanPercent.textContent = `${Math.round(humanOuterFraction * 100)}%`;
+      els.indicatorOverallOtherPercent.textContent = `${Math.round(otherOuterFraction * 100)}%`;
+      els.indicatorRingOverall.setAttribute(
+        "aria-label",
+        `${dominantOverallLabel} overall share ${dominantOverallPercent}%. AI ${Math.round(aiOuterFraction * 100)}%, Human ${Math.round(humanOuterFraction * 100)}%, Other ${Math.round(otherOuterFraction * 100)}%`
+      );
+
+      els.indicatorHumanAiValue.textContent = `${dominantHumanAiPercent}%`;
+      els.indicatorHumanAiLabel.textContent = dominantHumanAiLabel;
+      els.indicatorHumanAiCaption.textContent = aiHumanTotal > 0 ? "AI vs Human" : "No AI/Human result";
+      els.indicatorHumanAiAiPercent.textContent = `${Math.round(aiHumanAiFraction * 100)}%`;
+      els.indicatorHumanAiHumanPercent.textContent = `${Math.round(aiHumanHumanFraction * 100)}%`;
+      els.indicatorRingHumanAi.setAttribute(
+        "aria-label",
+        `${dominantHumanAiLabel} AI versus Human share ${dominantHumanAiPercent}%. AI ${Math.round(aiHumanAiFraction * 100)}%, Human ${Math.round(aiHumanHumanFraction * 100)}%`
+      );
+    }
+
+    function prettySourceName(source) {
+      return String(source || "unknown")
+        .replace(/^pass\d+_/, "")
+        .replaceAll(/[_-]+/g, " ")
+        .replace(/\b\w/g, (match) => match.toUpperCase());
+    }
+
+    function findContributionDetail(payload, matcher) {
+      const contributions = Array.isArray(payload.score_contributions) ? payload.score_contributions : [];
+      const match = contributions.find((item) => matcher(item.source || "", item.detail));
+      return match ? match.detail : null;
+    }
+
+    function extractPerplexity(payload) {
+      const detail = findContributionDetail(payload, (source, value) => source.includes("perplexity") || (typeof value === "object" && value && "perplexity" in value));
+      if (detail && typeof detail === "object" && detail !== null && "perplexity" in detail) {
+        return String(detail.perplexity);
+      }
+      return "Unavailable";
+    }
+
+    function extractPosDistribution(payload) {
+      const detail = findContributionDetail(payload, (_source, value) => typeof value === "object" && value !== null && "pos_distribution" in value);
+      if (detail && typeof detail === "object" && detail !== null && detail.pos_distribution) {
+        return JSON.stringify(detail.pos_distribution);
+      }
+      return "Unavailable";
+    }
+
+    function updateSummary(payload, classification, confidence) {
+      els.summaryClassification.textContent = classification;
+      els.summaryNote.hidden = classification !== "OTHER";
+      els.resultSummaryCard.classList.add("visible");
+    }
+
+    function updateTechnicalDetails(payload) {
       const text = els.textInput.value.trim();
-      if (!text) {
-        setStatus("Text is required", "error");
+
+      els.detailsSimhash.textContent = payload.simhash || computeSimhash64(text);
+      els.detailsTokenCount.textContent = String(countWords(text));
+      els.detailsRawOtherScore.textContent = String(typeof payload.garbage_score === "number" ? payload.garbage_score : 0);
+      els.detailsRawAiScore.textContent = String(typeof payload.ai_count === "number" ? payload.ai_count : 0);
+      els.detailsRawHumanScore.textContent = String(typeof payload.human_score === "number" ? payload.human_score : 0);
+      els.detailsAdminReport.textContent = JSON.stringify(payload, null, 2);
+    }
+
+    function determineClassification(payload) {
+      const ai = typeof payload.ai_count === "number" ? payload.ai_count : 0;
+      const human = typeof payload.human_score === "number" ? payload.human_score : 0;
+      const other = typeof payload.garbage_score === "number" ? payload.garbage_score : 0;
+      const total = ai + human + other;
+      const maxScore = Math.max(ai, human, other);
+
+      if (total <= 0 || maxScore <= 0) {
+        return { classification: "NO RESULT", confidence: 0 };
+      }
+      if (ai === maxScore && ai >= human && ai >= other) {
+        return { classification: "AI", confidence: Math.round((ai / total) * 100) };
+      }
+      if (human === maxScore && human >= ai && human >= other) {
+        return { classification: "HUMAN", confidence: Math.round((human / total) * 100) };
+      }
+      return { classification: "OTHER", confidence: Math.round((other / total) * 100) };
+    }
+
+    function renderResponse(payload) {
+      clearTimeout(state.analysisTimer);
+      state.analysisTimer = null;
+      clearError();
+
+      if (!payload || payload.error) {
+        showError(payload && payload.error ? payload.error : "Backend timeout or malformed response.");
+        setProgressError();
         return;
       }
 
-      updateShortSampleWarning(text);
+      state.lastResponse = payload;
+      localStorage.setItem("solidocto:last-response", JSON.stringify(payload));
+      state.spellingRanges = Array.isArray(payload.spelling_debug) ? payload.spelling_debug : [];
+      renderTextHighlights();
+      completeProgressPanel();
 
-      const hpWebsite = els.hpWebsite.value.trim();
-      const hpCompany = els.hpCompany.value.trim();
-      if (hpWebsite || hpCompany) {
-        setStatus("Submission blocked", "error");
+      const { classification, confidence } = determineClassification(payload);
+      updateIndicator(classification, confidence, {
+        ai: typeof payload.ai_count === "number" ? payload.ai_count : 0,
+        human: typeof payload.human_score === "number" ? payload.human_score : 0,
+        other: typeof payload.garbage_score === "number" ? payload.garbage_score : 0
+      });
+      updateSummary(payload, classification, confidence);
+      updateTechnicalDetails(payload);
+    }
+
+    function resetResultPanels() {
+      updateIndicator("NO RESULT", 0, { ai: 0, human: 0, other: 0 });
+      els.summaryClassification.textContent = "No result";
+      els.summaryNote.hidden = true;
+      els.resultSummaryCard.classList.remove("visible");
+      els.detailsSimhash.textContent = "-";
+      els.detailsTokenCount.textContent = "0";
+      els.detailsRawOtherScore.textContent = "0";
+      els.detailsRawAiScore.textContent = "0";
+      els.detailsRawHumanScore.textContent = "0";
+      els.detailsAdminReport.textContent = "No report";
+      resetProgressPanel();
+    }
+
+    function fnv1a64(input) {
+      let hash = 0xcbf29ce484222325n;
+      const prime = 0x100000001b3n;
+      const encoder = new TextEncoder();
+      for (const byte of encoder.encode(input)) {
+        hash ^= BigInt(byte);
+        hash = BigInt.asUintN(64, hash * prime);
+      }
+      return hash;
+    }
+
+    function computeSimhash64(text) {
+      const tokens = (text.toLowerCase().match(/[\p{L}\p{N}']+/gu) || []);
+      if (!tokens.length) {
+        return "0x0000000000000000";
+      }
+
+      const vector = new Array(64).fill(0);
+      for (const token of tokens) {
+        const hash = fnv1a64(token);
+        for (let index = 0n; index < 64n; index += 1n) {
+          vector[Number(index)] += ((hash >> index) & 1n) === 1n ? 1 : -1;
+        }
+      }
+
+      let result = 0n;
+      for (let index = 0n; index < 64n; index += 1n) {
+        if (vector[Number(index)] >= 0) {
+          result |= (1n << index);
+        }
+      }
+      return `0x${result.toString(16).padStart(16, "0")}`;
+    }
+
+    function applyUiConfig(configPayload) {
+      if (typeof configPayload.maxTextLength === "number" && Number.isFinite(configPayload.maxTextLength)) {
+        state.maxChars = Math.max(1, Math.floor(configPayload.maxTextLength));
+        els.textInput.maxLength = state.maxChars;
+      }
+      if (typeof configPayload.highlightSpelling === "boolean") {
+        state.highlightSpelling = configPayload.highlightSpelling;
+        if (!state.highlightSpelling) {
+          state.spellingRanges = [];
+        }
+      }
+      refreshInputLimitCopy();
+      updateCounter();
+    }
+
+    function connectSocket() {
+      state.suppressConnectionBanner = false;
+      clearError();
+      if (state.reconnectTimer) {
+        clearTimeout(state.reconnectTimer);
+        state.reconnectTimer = null;
+      }
+      if (state.ws && state.ws.readyState <= 1) {
+        state.ws.close();
+      }
+
+      setConnectionStatus("disconnected");
+      const ws = new WebSocket(DEFAULT_WS_URL);
+      state.ws = ws;
+
+      ws.onopen = () => {
+        setConnectionStatus("connected");
+        clearError();
+      };
+
+      ws.onerror = () => {
+        setConnectionStatus("disconnected");
+        showConnectionError("WebSocket disconnected. Reconnect to continue.");
+      };
+
+      ws.onclose = () => {
+        if (state.ws !== ws) {
+          return;
+        }
+        setConnectionStatus("disconnected");
+        showConnectionError("WebSocket disconnected. Reconnect to continue.");
+      };
+
+      ws.onmessage = (event) => {
+        let payload;
+        try {
+          payload = JSON.parse(event.data);
+        } catch (_error) {
+          showError("Received a non-JSON response from the backend.");
+          setProgressError();
+          return;
+        }
+
+        if (payload.type === "config") {
+          applyUiConfig(payload);
+          return;
+        }
+
+        if (payload.type === "progress") {
+          const mappedStep = BACKEND_PROGRESS_MAP[payload.step];
+          if (mappedStep) {
+            markStepSequence(mappedStep);
+          }
+          return;
+        }
+
+        renderResponse(payload);
+      };
+    }
+
+    function analyseText() {
+      const text = els.textInput.value.trim();
+
+      if (!validateInput()) {
+        showError(`Invalid input. Enter between 1 and ${state.maxChars} characters.`);
         return;
       }
+
+      if (els.hpWebsite.value.trim() || els.hpCompany.value.trim()) {
+        showError("Submission blocked.");
+        return;
+      }
+
+      if (!state.ws || state.ws.readyState !== WebSocket.OPEN) {
+        showError("WebSocket disconnected. Reconnect before analyzing.");
+        return;
+      }
+
+      clearError();
+      state.lastSubmittedText = text;
+      state.lastResponse = null;
+      state.spellingRanges = [];
+      renderTextHighlights();
+      resetProgressPanel();
+
+      setProgressState("pass1-similarity", "running");
 
       const payload = {
         text,
         datetimeUTC: new Date().toISOString(),
         simhash: computeSimhash64(text),
-        hp_website: hpWebsite,
-        hp_company: hpCompany
+        hp_website: els.hpWebsite.value.trim(),
+        hp_company: els.hpCompany.value.trim()
       };
 
+      els.detailsSimhash.textContent = payload.simhash;
+      els.detailsTokenCount.textContent = String(countWords(text));
+
+      clearTimeout(state.analysisTimer);
+      state.analysisTimer = setTimeout(() => {
+        showError("Backend timeout. Retry the analysis.");
+        setProgressError();
+      }, 20000);
+
       try {
-        if (state.progressTimer !== null) {
-          clearTimeout(state.progressTimer);
-          state.progressTimer = null;
-        }
-        state.progressQueue.length = 0;
-        state.pendingResponse = null;
-        state.pendingText = els.textInput.value;
         state.ws.send(JSON.stringify(payload));
-        setAnalysing(true);
-        setStatus("Analysing...", "warn");
-      } catch (_err) {
-        state.pendingText = null;
-        setStatus("Failed to send request", "error");
+      } catch (_error) {
+        clearTimeout(state.analysisTimer);
+        state.analysisTimer = null;
+        showError("Failed to send the analysis request.");
+        setProgressError();
       }
     }
 
     function clearForm() {
-      state.pendingText = null;
+      clearTimeout(state.analysisTimer);
+      state.analysisTimer = null;
+      clearError();
+      state.lastSubmittedText = "";
+      state.lastResponse = null;
       state.spellingRanges = [];
-      localStorage.removeItem("solidocto:inputText");
       els.textInput.value = "";
       els.hpWebsite.value = "";
       els.hpCompany.value = "";
-      els.shortSampleWarning.style.display = "none";
-      state.lastResponse = null;
-      localStorage.removeItem("solidocto:lastResponse");
+      els.sampleSelect.value = "";
+      localStorage.removeItem("solidocto:input-text");
+      localStorage.removeItem("solidocto:last-response");
       updateCounter();
-      els.aiScore.textContent = "-";
-      els.humanScore.textContent = "-";
-      els.garbageScore.textContent = "-";
-      els.novelty.textContent = "No result yet.";
-      els.novelty.className = "status status-warn";
-      els.simhashLine.textContent = "Simhash: -";
-      els.skipLine.textContent = "Skip reason: -";
-      els.scoreBreakdown.innerHTML = `
-        <div class="breakdown-title">Score contributions</div>
-        <div class="hint">Waiting for a result.</div>
-      `;
-      els.rawOutput.textContent = "{}";
-      renderDonut(0, 0, 0);
       renderTextHighlights();
+      resetResultPanels();
+      setInlineError("");
     }
 
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (!text) {
+          return;
+        }
+        els.textInput.value = text.slice(0, state.maxChars);
+        state.spellingRanges = [];
+        updateCounter();
+        validateInput();
+      } catch (_error) {
+        showError("Clipboard access failed. Paste directly into the input instead.");
+      }
+    }
+
+    function useSelectedSample() {
+      const selected = SAMPLE_TEXTS[els.sampleSelect.value];
+      if (!selected) {
+        return;
+      }
+      els.textInput.value = selected;
+      state.spellingRanges = [];
+      updateCounter();
+      validateInput();
+    }
+
+    function retryLastAction() {
+      if (!state.ws || state.ws.readyState !== WebSocket.OPEN) {
+        connectSocket();
+        return;
+      }
+      if (state.lastSubmittedText) {
+        analyseText();
+      }
+    }
+
+    function handleKeyboardShortcuts(event) {
+      if (event.key === "Escape" && state.activeDialog) {
+        event.preventDefault();
+        closeDialog();
+        return;
+      }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        clearForm();
+        return;
+      }
+      if (event.key === "Enter" && event.ctrlKey) {
+        event.preventDefault();
+        analyseText();
+      }
+    }
+
+    els.themeToggle.addEventListener("click", () => {
+      applyTheme(state.activeTheme === "dark" ? "light" : "dark");
+    });
+    els.reconnectButton.addEventListener("click", connectSocket);
+    els.ignoreErrorButton.addEventListener("click", ignoreConnectionError);
+    els.retryButton.addEventListener("click", retryLastAction);
+    els.useSampleButton.addEventListener("click", useSelectedSample);
+    els.pasteButton.addEventListener("click", pasteFromClipboard);
+    els.analyzeButton.addEventListener("click", analyseText);
+    els.clearButton.addEventListener("click", clearForm);
+    els.openDisclaimerButton.addEventListener("click", () => openDialog("disclaimer"));
+    els.openTermsButton.addEventListener("click", () => openDialog("terms"));
+    els.closeDisclaimerButton.addEventListener("click", () => closeDialog("disclaimer"));
+    els.closeTermsButton.addEventListener("click", () => closeDialog("terms"));
+    els.disclaimerDialogBackdrop.addEventListener("click", (event) => {
+      if (event.target === els.disclaimerDialogBackdrop) {
+        closeDialog("disclaimer");
+      }
+    });
+    els.termsDialogBackdrop.addEventListener("click", (event) => {
+      if (event.target === els.termsDialogBackdrop) {
+        closeDialog("terms");
+      }
+    });
     els.textInput.addEventListener("input", () => {
       state.spellingRanges = [];
-      localStorage.setItem("solidocto:inputText", els.textInput.value);
       updateCounter();
-      updateShortSampleWarning(els.textInput.value);
+      validateInput();
     });
     els.textInput.addEventListener("scroll", syncHighlightScroll);
+    document.addEventListener("keydown", handleKeyboardShortcuts);
 
     if (typeof ResizeObserver !== "undefined") {
-      const textObserver = new ResizeObserver(() => {
+      const observer = new ResizeObserver(() => {
         syncHighlightGeometry();
         renderTextHighlights();
       });
-      textObserver.observe(els.textInput);
+      observer.observe(els.textInput);
     } else {
       window.addEventListener("resize", () => {
         syncHighlightGeometry();
         renderTextHighlights();
       });
     }
-    els.connectBtn.addEventListener("click", connectSocket);
-    els.analyzeBtn.addEventListener("click", analyseText);
-    els.clearBtn.addEventListener("click", clearForm);
 
-    const _savedInput = localStorage.getItem("solidocto:inputText");
-    if (_savedInput) {
-      els.textInput.value = _savedInput;
+    applyTheme(state.activeTheme);
+
+    const savedInput = localStorage.getItem("solidocto:input-text");
+    if (savedInput) {
+      els.textInput.value = savedInput;
     }
-    syncHighlightGeometry();
     updateCounter();
-    updateShortSampleWarning(els.textInput.value);
-    connectSocket();
+    refreshInputLimitCopy();
+    validateInput();
+    syncHighlightGeometry();
+    renderTextHighlights();
+    resetResultPanels();
 
-    const savedResponse = localStorage.getItem("solidocto:lastResponse");
+    const savedResponse = localStorage.getItem("solidocto:last-response");
     if (savedResponse) {
       try {
-        const parsed = JSON.parse(savedResponse);
-        renderResponse(parsed);
-      } catch (_err) {
-        localStorage.removeItem("solidocto:lastResponse");
-        renderDonut(0, 0, 0);
+        renderResponse(JSON.parse(savedResponse));
+      } catch (_error) {
+        localStorage.removeItem("solidocto:last-response");
+        resetResultPanels();
       }
-    } else {
-      renderDonut(0, 0, 0);
     }
+
+    connectSocket();
   </script>
 </body>
 </html>

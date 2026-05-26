@@ -48,7 +48,9 @@ def run_construction_pass(
     nlp = _get_nlp(str(model_cfg["spacy_model"]))
     emb_model = _get_embedding_model(str(model_cfg["embedding_model"]))
 
-    sentences = _split_sentences(ctx.text, nlp)
+    doc = nlp(ctx.text)
+    ctx.parsed_doc = doc
+    sentences = [sent.text.strip() for sent in doc.sents if sent.text.strip()]
 
     if len(sentences) < int(model_cfg["min_sentences"]):
         return

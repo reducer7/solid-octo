@@ -110,10 +110,198 @@ human_detector:
     long_threshold: 20
     max_add: 2
 
+  # ---- test 5: grounded novelty score --------------------------------------
+  grounded_novelty:
+    add_ai: 3
+    max_add: 3
+    min_content_tokens: 12
+    low_grounding_ratio_lt: 0.18
+    high_novelty_ratio_gte: 0.28
+    sensory_terms:
+      - see
+      - saw
+      - seen
+      - hear
+      - heard
+      - smell
+      - smelled
+      - taste
+      - tasted
+      - feel
+      - felt
+      - touch
+      - touched
+      - watch
+      - watched
+      - notice
+      - noticed
+    proprioceptive_terms:
+      - lean
+      - leaned
+      - bend
+      - bent
+      - reach
+      - reached
+      - grab
+      - grabbed
+      - hold
+      - held
+      - sit
+      - sat
+      - stand
+      - stood
+      - turn
+      - turned
+      - step
+      - stepped
+      - walk
+      - walked
+    spatial_prepositions:
+      - in
+      - on
+      - at
+      - near
+      - under
+      - over
+      - behind
+      - beside
+      - between
+      - through
+      - across
+      - into
+      - onto
+      - inside
+      - outside
+    concrete_nouns:
+      - table
+      - bench
+      - door
+      - doorway
+      - window
+      - stair
+      - stairs
+      - shed
+      - room
+      - street
+      - market
+      - pocket
+      - key
+      - keys
+      - rail
+      - dog
+      - coffee
+      - grounds
+      - drawer
+      - hose
+      - screw
+      - coat
+      - hand
+      - floor
+      - car
+    abstract_nouns:
+      - framework
+      - frameworks
+      - system
+      - systems
+      - process
+      - processes
+      - structure
+      - structures
+      - perspective
+      - perspectives
+      - uncertainty
+      - identity
+      - meaning
+      - abstraction
+      - synthesis
+      - possibility
+      - possibilities
+      - transformation
+      - adaptation
+      - pattern
+      - patterns
+      - concept
+      - concepts
+      - implication
+      - implications
+    novelty_terms:
+      - kaleidoscopic
+      - liminal
+      - transformative
+      - emergent
+      - conceptual
+      - synthesis
+      - abstraction
+      - reframing
+      - possibility
+      - possibilities
+      - identity
+      - uncertainty
+
+  # ---- test 6: local contradictions ---------------------------------------
+  local_contradictions:
+    add_human: 2
+    max_add: 4
+    patterns:
+      - "\\bI\\s+(?:was|am|did|do|had|have|can|could|will|would|should)\\b[^.!?]{0,80}(?:oh\\s+no|no|actually|wait),?\\s+I\\s+(?:wasn't|am\\s+not|didn't|don't|hadn't|haven't|can't|couldn't|won't|wouldn't|shouldn't)\\b"
+      - "\\bI\\s+(?:wasn't|am\\s+not|didn't|don't|hadn't|haven't|can't|couldn't|won't|wouldn't|shouldn't)\\b[^.!?]{0,80}(?:oh\\s+no|no|actually|wait),?\\s+I\\s+(?:was|am|did|do|had|have|can|could|will|would|should)\\b"
+
+  # ---- test 7: temporal drift ---------------------------------------------
+  temporal_drift:
+    tense:
+      add_human: 1
+      max_add: 4
+      min_tense_cues: 2
+      future_markers:
+        - will
+        - gonna
+      past_markers:
+        - was
+        - were
+        - did
+        - had
+      present_markers:
+        - am
+        - is
+        - are
+        - do
+        - does
+        - have
+        - has
+    perspective:
+      add_human: 1
+      max_add: 4
+      first_singular:
+        - i
+        - me
+        - my
+        - mine
+      first_plural:
+        - we
+        - us
+        - our
+        - ours
+      second_person:
+        - you
+        - your
+        - yours
+    return:
+      add_human: 1
+      max_add: 4
+      lookahead_sentences: 2
+      min_anchor_token_len: 4
+      min_anchor_tokens: 1
+      min_anchor_overlap: 1
+      patterns:
+        - "\\bback to (?:that|it|the point|what I was saying)\\b"
+        - "\\bas I was saying\\b"
+        - "\\bto go back\\b"
+        - "\\bwhere was I\\b"
+
   # ---- test 15: spelling mistakes ------------------------------------------
   spelling:
     add_human: 1
-    max_add: 8
+    max_add: 4
     min_token_len: 3
     count_elongations: true
     elongation_repeat_min: 3

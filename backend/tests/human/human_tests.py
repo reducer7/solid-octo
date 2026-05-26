@@ -57,10 +57,19 @@ _ANGLE_LINE_RE = re.compile(r"^\s*>\s", re.MULTILINE)
 _SENTENCE_SPLIT_RE = re.compile(r"[.!?]+")
 
 # Candidate word tokenizer for spelling checks.
-_SPELL_TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z'\-]*")
+_SPELL_TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z'’‘\-]*")
 
 # Repeated character run for slang/elongation detection (e.g. "reeeally").
 _ELONGATION_RE = re.compile(r"(.)\1{2,}", re.IGNORECASE)
+
+_STOPWORD_TOKENS = {
+    "a", "an", "and", "any", "as", "at", "back", "be", "been", "but", "by",
+    "for", "from", "had", "has", "have", "he", "her", "here", "him", "his",
+    "i", "if", "in", "into", "is", "it", "its", "me", "my", "no", "not", "of",
+    "oh", "on", "or", "our", "she", "so", "that", "the", "their", "them", "then",
+    "there", "they", "this", "to", "up", "us", "was", "we", "were", "what", "where",
+    "who", "why", "with", "you", "your", "anyway",
+}
 
 _SPELL_CHECKER = SpellChecker()
 
@@ -80,6 +89,9 @@ def run_human_pass(
     _test_grammar(ctx, human_cfg["grammar"], ctx.text)
     _test_micro_hesitations(ctx, human_cfg["micro_hesitation"], ctx.text)
     _test_sentence_rhythm(ctx, human_cfg["rhythm"], ctx.text)
+    _test_grounded_novelty(ctx, human_cfg["grounded_novelty"])
+    _test_local_contradictions(ctx, human_cfg["local_contradictions"], ctx.text)
+    _test_temporal_drift(ctx, human_cfg["temporal_drift"], ctx.text)
     _test_spelling_mistakes(
         ctx,
         human_cfg["spelling"],
@@ -324,6 +336,312 @@ def _test_sentence_rhythm(
 
 
 # ---------------------------------------------------------------------------
+# Test 5 — Grounded novelty score
+# ---------------------------------------------------------------------------
+
+
+def _test_grounded_novelty(
+    ctx: PipelineContext,
+    cfg: dict[str, Any],
+) -> None:
+    doc = ctx.parsed_doc
+    if doc is None:
+        return
+
+    sensory_terms = {str(item).lower() for item in cfg.get("sensory_terms", [])}
+    proprioceptive_terms = {str(item).lower() for item in cfg.get("proprioceptive_terms", [])}
+    spatial_prepositions = {str(item).lower() for item in cfg.get("spatial_prepositions", [])}
+    concrete_nouns = {str(item).lower() for item in cfg.get("concrete_nouns", [])}
+    abstract_nouns = {str(item).lower() for item in cfg.get("abstract_nouns", [])}
+    novelty_terms = {str(item).lower() for item in cfg.get("novelty_terms", [])}
+
+    content_tokens = [tok for tok in doc if tok.is_alpha and not tok.is_stop]
+    if len(content_tokens) < int(cfg.get("min_content_tokens", 0)):
+        return
+
+    sensory_hits = 0
+    proprio_hits = 0
+    spatial_hits = 0
+    concrete_hits = 0
+    abstract_hits = 0
+    novelty_hits = 0
+
+    for token in doc:
+        if not token.is_alpha:
+            continue
+
+        lemma = token.lemma_.lower()
+        text = token.text.lower()
+
+        if lemma in sensory_terms or text in sensory_terms:
+            sensory_hits += 1
+        if lemma in proprioceptive_terms or text in proprioceptive_terms:
+            proprio_hits += 1
+        if token.pos_ == "ADP" and text in spatial_prepositions:
+            spatial_hits += 1
+        if token.pos_ in ("NOUN", "PROPN") and (lemma in concrete_nouns or text in concrete_nouns):
+            concrete_hits += 1
+        if token.pos_ in ("NOUN", "PROPN") and (lemma in abstract_nouns or text in abstract_nouns):
+            abstract_hits += 1
+        if lemma in novelty_terms or text in novelty_terms:
+            novelty_hits += 1
+
+    content_count = len(content_tokens)
+    grounding_ratio = (sensory_hits + proprio_hits + spatial_hits + concrete_hits) / content_count
+    novelty_ratio = (abstract_hits + novelty_hits) / content_count
+
+    if grounding_ratio >= float(cfg.get("low_grounding_ratio_lt", 0.0)):
+        return
+    if novelty_ratio < float(cfg.get("high_novelty_ratio_gte", 1.0)):
+        return
+
+    detail = {
+        "grounding_ratio": round(grounding_ratio, 4),
+        "novelty_ratio": round(novelty_ratio, 4),
+        "sensory_hits": sensory_hits,
+        "proprio_hits": proprio_hits,
+        "spatial_hits": spatial_hits,
+        "concrete_hits": concrete_hits,
+        "abstract_hits": abstract_hits,
+        "novelty_hits": novelty_hits,
+        "content_tokens": content_count,
+    }
+    _add_capped_score(
+        ctx,
+        score="ai",
+        raw_count=int(cfg.get("add_ai", 0)),
+        max_add=int(cfg.get("max_add", 0)),
+        source="pass5_grounded_novelty",
+        detail=detail,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test 6 — Local contradictions
+# ---------------------------------------------------------------------------
+
+
+def _test_local_contradictions(
+    ctx: PipelineContext,
+    cfg: dict[str, Any],
+    text: str,
+) -> None:
+    total_matches = 0
+    for raw_pattern in cfg["patterns"]:
+        compiled = re.compile(raw_pattern, re.IGNORECASE)
+        total_matches += len(compiled.findall(text))
+
+    raw_count = total_matches * int(cfg.get("add_human", 1))
+    _add_capped_human(
+        ctx,
+        raw_count,
+        int(cfg.get("max_add", 0)),
+        "pass5_local_contradiction",
+        f"local contradiction markers: {total_matches}",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test 7 — Temporal drift
+# ---------------------------------------------------------------------------
+
+
+def _test_temporal_drift(
+    ctx: PipelineContext,
+    cfg: dict[str, Any],
+    text: str,
+) -> None:
+    sentences = _sentence_texts(ctx.parsed_doc, text)
+
+    tense_count = _count_tense_shifts(ctx.parsed_doc, sentences, cfg["tense"])
+    _add_capped_human(
+        ctx,
+        tense_count * int(cfg["tense"].get("add_human", 1)),
+        int(cfg["tense"].get("max_add", 0)),
+        "pass5_temporal_drift_tense",
+        f"temporal drift tense changes: {tense_count}",
+    )
+
+    perspective_count = _count_perspective_shifts(sentences, cfg["perspective"])
+    _add_capped_human(
+        ctx,
+        perspective_count * int(cfg["perspective"].get("add_human", 1)),
+        int(cfg["perspective"].get("max_add", 0)),
+        "pass5_temporal_drift_perspective",
+        f"temporal drift perspective changes: {perspective_count}",
+    )
+
+    return_count = _count_unreturned_callbacks(sentences, cfg["return"])
+    _add_capped_human(
+        ctx,
+        return_count * int(cfg["return"].get("add_human", 1)),
+        int(cfg["return"].get("max_add", 0)),
+        "pass5_temporal_drift_return",
+        f"temporal drift missing returns: {return_count}",
+    )
+
+
+def _count_tense_shifts(
+    doc: Any,
+    sentences: list[str],
+    cfg: dict[str, Any],
+) -> int:
+    if doc is None:
+        return _count_tense_shifts_regex(sentences, cfg)
+
+    future_markers = {str(item).lower() for item in cfg.get("future_markers", [])}
+    min_tense_cues = int(cfg.get("min_tense_cues", 2))
+    count = 0
+
+    for sent in doc.sents:
+        past_cues = 0
+        present_cues = 0
+        future_cues = 0
+
+        for token in sent:
+            if not token.is_alpha:
+                continue
+
+            lower = token.lower_
+            if lower in future_markers:
+                future_cues += 1
+
+            if lower in {str(item).lower() for item in cfg.get("past_markers", [])}:
+                past_cues += 1
+            if lower in {str(item).lower() for item in cfg.get("present_markers", [])}:
+                present_cues += 1
+
+            if token.pos_ not in ("AUX", "VERB"):
+                continue
+
+            if token.tag_ in ("VBD", "VBN"):
+                past_cues += 1
+            if token.tag_ in ("VBP", "VBZ"):
+                present_cues += 1
+
+        total_cues = past_cues + present_cues + future_cues
+        if total_cues < min_tense_cues:
+            continue
+        if past_cues > 0 and (present_cues > 0 or future_cues > 0):
+            count += 1
+
+    return count
+
+
+def _count_tense_shifts_regex(
+    sentences: list[str],
+    cfg: dict[str, Any],
+) -> int:
+    past_markers = {str(item).lower() for item in cfg.get("past_markers", [])}
+    present_markers = {str(item).lower() for item in cfg.get("present_markers", [])}
+    future_markers = {str(item).lower() for item in cfg.get("future_markers", [])}
+    min_tense_cues = int(cfg.get("min_tense_cues", 2))
+    count = 0
+
+    for sentence in sentences:
+        tokens = re.findall(r"\b[a-z']+\b", sentence.lower())
+        past_cues = sum(1 for token in tokens if token in past_markers)
+        present_cues = sum(1 for token in tokens if token in present_markers)
+        future_cues = sum(1 for token in tokens if token in future_markers)
+        total_cues = past_cues + present_cues + future_cues
+        if total_cues < min_tense_cues:
+            continue
+        if past_cues > 0 and (present_cues > 0 or future_cues > 0):
+            count += 1
+
+    return count
+
+
+def _count_perspective_shifts(
+    sentences: list[str],
+    cfg: dict[str, Any],
+) -> int:
+    first_singular = {str(item).lower() for item in cfg.get("first_singular", [])}
+    first_plural = {str(item).lower() for item in cfg.get("first_plural", [])}
+    second_person = {str(item).lower() for item in cfg.get("second_person", [])}
+    count = 0
+    previous_bucket: str | None = None
+
+    for sentence in sentences:
+        tokens = re.findall(r"\b[a-z']+\b", sentence.lower())
+        buckets: set[str] = set()
+        if any(token in first_singular for token in tokens):
+            buckets.add("first_singular")
+        if any(token in first_plural for token in tokens):
+            buckets.add("first_plural")
+        if any(token in second_person for token in tokens):
+            buckets.add("second_person")
+
+        if len(buckets) >= 2:
+            count += 1
+            previous_bucket = None
+            continue
+
+        current_bucket = next(iter(buckets), None)
+        if current_bucket is None:
+            continue
+
+        if previous_bucket is not None and current_bucket != previous_bucket:
+            count += 1
+
+        previous_bucket = current_bucket
+
+    return count
+
+
+def _count_unreturned_callbacks(
+    sentences: list[str],
+    cfg: dict[str, Any],
+) -> int:
+    lookahead = int(cfg.get("lookahead_sentences", 2))
+    min_anchor_tokens = int(cfg.get("min_anchor_tokens", 1))
+    min_anchor_overlap = int(cfg.get("min_anchor_overlap", 1))
+    min_anchor_token_len = int(cfg.get("min_anchor_token_len", 4))
+    count = 0
+
+    for idx, sentence in enumerate(sentences):
+        match = None
+        for raw_pattern in cfg["patterns"]:
+            match = re.search(raw_pattern, sentence, re.IGNORECASE)
+            if match:
+                break
+
+        if match is None:
+            continue
+
+        anchor_source = sentence[: match.start()].strip()
+        anchor_tokens = _extract_anchor_tokens(anchor_source, min_anchor_token_len)
+        if len(anchor_tokens) < min_anchor_tokens and idx > 0:
+            anchor_tokens = _extract_anchor_tokens(sentences[idx - 1], min_anchor_token_len)
+
+        if len(anchor_tokens) < min_anchor_tokens:
+            continue
+
+        follow_up = [sentence[match.end() :]]
+        follow_up.extend(sentences[idx + 1 : idx + 1 + lookahead])
+        follow_up_tokens = _extract_anchor_tokens(" ".join(follow_up), min_anchor_token_len)
+
+        if len(anchor_tokens & follow_up_tokens) < min_anchor_overlap:
+            count += 1
+
+    return count
+
+
+def _sentence_texts(doc: Any, text: str) -> list[str]:
+    if doc is not None:
+        return [sent.text.strip() for sent in doc.sents if sent.text.strip()]
+    return [part.strip() for part in _SENTENCE_SPLIT_RE.split(text) if part.strip()]
+
+
+def _extract_anchor_tokens(text: str, min_token_len: int) -> set[str]:
+    return {
+        token
+        for token in re.findall(r"\b[a-z']+\b", text.lower())
+        if len(token) >= min_token_len and token not in _STOPWORD_TOKENS
+    }
+
+
+# ---------------------------------------------------------------------------
 # Test 15 — Spelling mistakes
 # ---------------------------------------------------------------------------
 
@@ -346,14 +664,14 @@ def _test_spelling_mistakes(
 
     for match in _SPELL_TOKEN_RE.finditer(text):
         raw = match.group(0)
-        token = raw.strip("'\"").replace("-", "")
+        token = raw.strip("'\"’‘").replace("-", "").replace("’", "'").replace("‘", "'")
         if not token:
             continue
         if len(token) < min_token_len:
             continue
 
-        # Balanced policy: likely proper nouns/names (capitalized) are ignored.
-        if token[0].isupper() and not token.isupper():
+        # Balanced policy: ignore capitalized words and all-caps initialisms.
+        if token[0].isupper():
             continue
 
         lowered = token.lower()
@@ -446,6 +764,28 @@ def _add_capped_human(
     amount = min(raw_count, max_add)
     ctx.score.human_score += amount
     _record_score_contribution(ctx, "human", amount, source, detail)
+
+
+def _add_capped_score(
+    ctx: PipelineContext,
+    score: str,
+    raw_count: int,
+    max_add: int,
+    source: str,
+    detail: dict[str, Any],
+) -> None:
+    if raw_count <= 0:
+        return
+    amount = min(raw_count, max_add)
+    if score == "ai":
+        ctx.score.ai_score += amount
+    elif score == "human":
+        ctx.score.human_score += amount
+    elif score == "garbage":
+        ctx.score.garbage_score += amount
+    else:
+        raise ValueError(f"Unsupported score type: {score}")
+    _record_score_contribution(ctx, score, amount, source, detail)
 
 
 def _record_score_contribution(

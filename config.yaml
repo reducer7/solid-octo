@@ -6,8 +6,7 @@ app:
   require_captcha: false
   check_similarity: false
   highlight_spelling: true
-  highlight_spelling: true
-
+  
 ui:
   progress_display_ms: 250
 

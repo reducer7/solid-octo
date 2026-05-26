@@ -126,7 +126,16 @@ def _validate_ai_detector(cfg: dict[str, Any]) -> None:
 
 def _validate_human_detector(cfg: dict[str, Any]) -> None:
     human = _require(cfg, "human_detector", "human_tests.yaml")
-    for key in ("key_markers", "grammar", "micro_hesitation", "rhythm", "spelling"):
+    for key in (
+        "key_markers",
+        "grammar",
+        "micro_hesitation",
+        "rhythm",
+        "grounded_novelty",
+        "local_contradictions",
+        "temporal_drift",
+        "spelling",
+    ):
         _require(human, key, "human_tests.yaml.human_detector")
 
 

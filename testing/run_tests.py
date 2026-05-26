@@ -1166,6 +1166,109 @@ class PipelineTests(unittest.TestCase):
         )
         self._assert_source(entry, "pass5_uneven_rhythm")
 
+    def test_pass5_grounded_novelty_scored(self) -> None:
+        entry = self._run(
+            "The framework produced a kaleidoscopic synthesis of identity and possibility across abstract layers. "
+            "This transformative process invited emergent meaning, conceptual reframing, and liminal uncertainty "
+            "throughout the system."
+        )
+        contributions = [
+            item for item in entry["score_contributions"] if item["source"] == "pass5_grounded_novelty"
+        ]
+        self.assertTrue(contributions, "Expected a pass5_grounded_novelty contribution")
+        self.assertEqual(contributions[0]["score"], "ai")
+        self.assertEqual(contributions[0]["amount"], 3)
+
+    def test_pass5_grounded_novelty_not_scored_for_grounded_anecdote(self) -> None:
+        entry = self._run(
+            "I leaned over the sticky table, smelled onions near the doorway, and reached into my coat pocket for the keys. "
+            "The dog scratched at the back step while I looked through the window and set the coffee on the bench. "
+            "Later I bent under the shed stairs and felt the cold rail against my hand."
+        )
+        self.assertFalse(
+            any(item["source"] == "pass5_grounded_novelty" for item in entry["score_contributions"]),
+            "Grounded anecdotal text should not trigger pass5_grounded_novelty",
+        )
+
+    def test_pass5_grounded_novelty_not_scored_for_neutral_concrete_prose(self) -> None:
+        entry = self._run(
+            "The mechanic placed the wrench on the bench beside the window and checked the hose under the sink. "
+            "He opened the drawer, picked up the screws, and set the coffee near the door before walking outside."
+        )
+        self.assertFalse(
+            any(item["source"] == "pass5_grounded_novelty" for item in entry["score_contributions"]),
+            "Neutral concrete prose should not trigger pass5_grounded_novelty",
+        )
+
+    def test_pass5_local_contradiction_scored(self) -> None:
+        entry = self._run(
+            self._BASE
+            + "I was at the station for hours, oh no I wasn't actually, I stayed home all evening instead."
+        )
+        self._assert_source(entry, "pass5_local_contradiction")
+
+    def test_pass5_local_contradiction_not_scored_for_simple_negation(self) -> None:
+        entry = self._run(
+            self._BASE
+            + "I was at the station for hours, and no one realized I wasn't feeling well by the end."
+        )
+        self.assertFalse(
+            any(item["source"] == "pass5_local_contradiction" for item in entry["score_contributions"]),
+            "Simple negation without a self-retraction should not trigger pass5_local_contradiction",
+        )
+
+    def test_pass5_temporal_drift_tense_scored(self) -> None:
+        entry = self._run(
+            self._BASE
+            + "I was walking to the shop when I suddenly turn around and head back home."
+        )
+        self._assert_source(entry, "pass5_temporal_drift_tense")
+
+    def test_pass5_temporal_drift_tense_not_scored_for_consistent_tense(self) -> None:
+        entry = self._run(
+            self._BASE
+            + "I was walking to the shop when I suddenly turned around and headed back home."
+        )
+        self.assertFalse(
+            any(item["source"] == "pass5_temporal_drift_tense" for item in entry["score_contributions"]),
+            "Consistent tense should not trigger pass5_temporal_drift_tense",
+        )
+
+    def test_pass5_temporal_drift_perspective_scored(self) -> None:
+        entry = self._run(
+            self._BASE
+            + "I kept explaining the problem, then you start wondering why we are still standing there."
+        )
+        self._assert_source(entry, "pass5_temporal_drift_perspective")
+
+    def test_pass5_temporal_drift_perspective_not_scored_for_single_perspective(self) -> None:
+        entry = self._run(
+            self._BASE
+            + "I kept explaining the problem, and I kept wondering why I was still standing there."
+        )
+        self.assertFalse(
+            any(item["source"] == "pass5_temporal_drift_perspective" for item in entry["score_contributions"]),
+            "Single-perspective narration should not trigger pass5_temporal_drift_perspective",
+        )
+
+    def test_pass5_temporal_drift_return_scored(self) -> None:
+        entry = self._run(
+            "The broken tap kept dripping all morning and the missing wrench still bothered me. "
+            "Anyway, back to that, I started complaining about the neighbour's dog and the traffic outside. "
+            "Then I made tea and stared at the fence for a while."
+        )
+        self._assert_source(entry, "pass5_temporal_drift_return")
+
+    def test_pass5_temporal_drift_return_not_scored_when_topic_returns(self) -> None:
+        entry = self._run(
+            "The broken tap kept dripping all morning and the missing wrench still bothered me. "
+            "Anyway, back to that, I found the wrench beside the tap and fixed the leak before lunch."
+        )
+        self.assertFalse(
+            any(item["source"] == "pass5_temporal_drift_return" for item in entry["score_contributions"]),
+            "A real callback should not trigger pass5_temporal_drift_return",
+        )
+
     def test_pass5_spelling_mistake_scored(self) -> None:
         entry = self._run(
             self._BASE
@@ -1183,12 +1286,39 @@ class PipelineTests(unittest.TestCase):
             "Capitalized name-heavy text should not trigger pass5_spelling_mistake by itself",
         )
 
+    def test_pass5_spelling_ignores_initialisms(self) -> None:
+        entry = self._run(
+            self._BASE
+            + "NASA and CSIRO briefed the team while UNESCO reviewed the final album notes."
+        )
+        self.assertFalse(
+            any(item["source"] == "pass5_spelling_mistake" for item in entry["score_contributions"]),
+            "All-caps initialisms should not trigger pass5_spelling_mistake",
+        )
+
     def test_pass5_spelling_counts_elongated_slang(self) -> None:
         entry = self._run(
             self._BASE
             + "That was reeeally goooood and sooo weird but kinda hilarious in the end."
         )
         self._assert_source(entry, "pass5_spelling_mistake")
+
+    def test_spelling_debug_does_not_split_curly_apostrophe_contractions(self) -> None:
+        self.config["root"]["app"]["check_similarity"] = False
+        self.config["root"]["app"]["highlight_spelling"] = True
+        payload = {
+            "text": "I love all my kids and wouldn’t change anything about them.",
+            "captcha_token": "ok",
+            "datetimeUTC": "2026-05-19T10:00:00Z",
+            "simhash": None,
+        }
+
+        response = process_submission(payload, self.store, self.config, PROJECT_ROOT)
+        self.assertIn("spelling_debug", response)
+        self.assertFalse(
+            any(item.get("token", "").lower() == "wouldn" for item in response["spelling_debug"]),
+            "Curly-apostrophe contractions should not be split into partial tokens",
+        )
 
 
 if __name__ == "__main__":

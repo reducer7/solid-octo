@@ -138,23 +138,23 @@ The report will also fuzz slightly the results to ensure the markers cannot be f
 ### Pass 4: AI detector
     - these are specific AI detections.
     1. Key markers
-        - em dash present - +1 AI for each presence to max +3
-        - colon present +1 AI for each presence to max +2
-        - asides in parentheses () +1 AI for each to max +2
-        - en dash present - +1 AI for each to max +2
-        - matching typographer's quotes +1 AI for each to max +3
-        - use of single correctly positioned curly or typographers quotes +1 AI for each to max +2
+        a. em dash present - +1 AI for each presence to max +3
+        b. colon present +1 AI for each presence to max +2
+        c. asides in parentheses () +1 AI for each to max +2
+        d. en dash present - +1 AI for each to max +2
+        e. matching typographer's quotes +1 AI for each to max +3
+        f. use of single correctly positioned curly or typographers quotes +1 AI for each to max +2
         - don't double count if matching in a single category
 
     2. Grammar
-        - correctly nested quotes "this is a 'quote' from Jones", for example - +2 AI for each one max +4
-        - correct use of possessives on plurals, so example "we value our customers' opinions" 1 AI for each one max +2
+        a. correctly nested quotes "this is a 'quote' from Jones", for example - +2 AI for each one max +4
+        b. correct use of possessives on plurals, so example "we value our customers' opinions" 1 AI for each one max +2
 
     3. Constructed Sentences
         - “In summary,”, “Overall,”, “Ultimately,”, “In other words,”, “That said,”, “To be clear,”, “For example,”
         - +1 AI maximum 3.
     4. Perfect parallelism
-    
+        - TBA
     5. Overused "balance" hedges
         - AI will hedge, look for 
             - "on the other hand", or "on the one hand"
@@ -180,6 +180,7 @@ The report will also fuzz slightly the results to ensure the markers cannot be f
         - “Here are some key points:”, “The following are…”, “Let’s break this down:”, “Consider the following:”
         - +1 AI, max 5.
 
+
     
         
 
@@ -187,39 +188,46 @@ The report will also fuzz slightly the results to ensure the markers cannot be f
     - these are specific Human detections
     - where needed, use the LLMs and other tools loaded up from pass 3.
     1. Key markers
-        - single hyphen '-' use each +1 Human to max +2
-        - double hyphen '--' use +1 human to max +2
-        - straight quotes - +1 human to max +2
-        - triple dot ellipsis '...' +1 human to max +2
-        - double dot '..' +2 to human each to max +4
-        - semi colon +1 to human to max +2
-        - unclosed quotes or parenthesis +1 to human to max +2
+        a. single hyphen '-' use each +1 Human to max +2
+        b. double hyphen '--' use +1 human to max +2
+        c. straight quotes - +1 human to max +2
+        d. triple dot ellipsis '...' +1 human to max +2
+        e. double dot '..' +2 to human each to max +4
+        f. semi colon +1 to human to max +2
+        g. unclosed quotes or parenthesis +1 to human to max +2
     2. Grammar
-        - incorrect use of possessive apostrophe +1 human each one to max +3
-        - incorrect use of your, you're, its, it's, they're, their +1 human each one to max +3
-        - inconsistent capitalizations per instance +1 human to max +3
-        - inconsistent spacing around punctuation. +1 human to max +3
-        - repeated words like "the the" +1 human to max +3
-        - mismatched "a" and "an" +1 human to max +3
-        - inconsistent paragraph boundaries +1 human to max +3
-        - list formatting with various markers, like hyphens and angle brackets and numbers and letters mixed, or missing Oxford comma +1 human to each, max +3
+        a. incorrect use of possessive apostrophe +1 human each one to max +3
+        b. incorrect use of your, you're, its, it's, they're, their +1 human each one to max +3
+        c. inconsistent capitalizations per instance +1 human to max +3
+        d. inconsistent spacing around punctuation. +1 human to max +3
+        e. repeated words like "the the" +1 human to max +3
+        f. mismatched "a" and "an" +1 human to max +3
+        g. inconsistent paragraph boundaries +1 human to max +3
+        h. list formatting with various markers, like hyphens and angle brackets and numbers and letters mixed, or missing Oxford comma +1 human to each, max +3
     3. Micro-hesitations
         - mid sentence course corrections - +1 human each one to max +3
     4. Uneven sentence rhythm
         - mixture of short punchy vs long rambles +1 human each to max +2
-    5. Idiosyncratic metaphors and analogies
-        - TBA
+    5. Grounded Novelty Score
+        - Use the existing POS and dependency parse on the source text
+        - search for sensory words (saw, smelled, tasted, felt, etc)
+        - search for proprioceptive words (leaned, bent, reached)
+        - concrete nouns
+        - spatial prepositions
+        - compute the ratio of (concrete tokens / abstract tokens)
+        - if we have LOW grounding but HIGH novelty - +3 AI
     6. Local contradictions
         - "I was there, oh no I wasn't actually" +2 human max +4
     7. Temporal Drift
-        - Tense changes mid sentence +1 human to max +4
-        - Perspective from I, we, you changes +1 human to max +4
-        - Not returning to a previous point +1 human to max +4
+        a. Tense changes mid sentence +1 human to max +4
+        b. Perspective from I, we, you changes +1 human to max +4
+        c. Not returning to a previous point +1 human to max +4
     8. non-linear thought
         - topics in the same sentence are incorrectly matched
     9. Emotional exasperation and leakage
-        - annoyance +2 human to max +4
-        - apathy +2 human to max +4
+        a. annoyance +2 human to max +4
+        b. apathy +2 human to max +4
+        c. swearing, cussing +2 human to max +4
     10. Formal language merges with informal 
         - "the statistical anomaly was persistent, and I hardly slept!"
     11. Personal specificity
@@ -227,12 +235,14 @@ The report will also fuzz slightly the results to ensure the markers cannot be f
     12. Trail off
         - human effort wraps up quickly as the author gets tired of the conversions. Sentence complexity and construction is much clearer in the early text, and trails off at the end
     13. Uncertainty and "I think" qualifiers
-        - "I'm not sure", "I think", "Maybe" +2 human, max +4 each one
-        - Clear lack of commitment , +4 human each one, max +16
+        a. "I'm not sure", "I think", "Maybe" +2 human, max +4 each one
+        b. Clear lack of commitment , +4 human each one, max +16
     14. repeated words in same context
         - "the floating boat floated", human +2 max +4
     15. Spelling mistakes
-        - add +1 human for each mistake, max +8
+        - add +1 human for each mistake, max +4
+    16. Crushed words
+        - where there is a missing space, for example "Iwent to the park". add +1 human, max +2
 
 
 
